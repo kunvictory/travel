@@ -826,3 +826,592 @@
     <div class="bd-desc">晚餐＋超市採買</div>
   </div>
   <div class="budget-day">
+    <div class="bd-top"><span class="bd-day">Day2 · 11/1</span><span class="bd-amt">¥1,700–3,300/人</span></div>
+    <div class="bd-desc">午餐＋富士山周邊零星消費</div>
+  </div>
+  <div class="budget-day">
+    <div class="bd-top"><span class="bd-day">Day3 · 11/2</span><span class="bd-amt">¥3,900–5,000/人</span></div>
+    <div class="bd-desc">交通＋3餐（不含購物）</div>
+  </div>
+  <div class="budget-day">
+    <div class="bd-top"><span class="bd-day">Day4 · 11/3</span><span class="bd-amt">¥3,700–4,700/人</span></div>
+    <div class="bd-desc">來回交通＋餐飲＋門票</div>
+  </div>
+  <div class="budget-day">
+    <div class="bd-top"><span class="bd-day">Day5 · 11/4</span><span class="bd-amt">¥3,800–7,500/人</span></div>
+    <div class="bd-desc">交通＋餐飲＋晴空塔門票（依方案）</div>
+  </div>
+  <div class="budget-day">
+    <div class="bd-top"><span class="bd-day">Day6 · 11/5</span><span class="bd-amt">¥5,300–7,300/人</span></div>
+    <div class="bd-desc">交通＋2餐＋扭蛋</div>
+  </div>
+  <div class="budget-day">
+    <div class="bd-top"><span class="bd-day">Day7 · 11/6</span><span class="bd-amt">¥4,400–6,500/人</span></div>
+    <div class="bd-desc">交通＋螃蟹放題</div>
+  </div>
+  <div class="budget-day">
+    <div class="bd-top"><span class="bd-day">Day8 · 11/7</span><span class="bd-amt">¥4,250–5,250/人</span></div>
+    <div class="bd-desc">N'EX交通＋表參道小吃</div>
+  </div>
+
+  <div class="budget-total">
+    <span>8天餐飲交通門票預估（每人）</span><b>¥29,550–43,050</b>
+  </div>
+  <div class="budget-total">
+    <span>加上住宿＋包車均攤（每人約¥33,185）</span><b>¥62,700–76,200</b>
+  </div>
+  <div class="fx-note" style="margin:4px 16px 18px;">以上為粗抓區間，不含購物、伴手禮與個人消費，實際花費請以記帳功能追蹤。</div>
+  <!-- 匯率速算器 -->
+  <section class="fx-card">
+    <h2>💴 匯率速算（日圓 → 台幣）</h2>
+    <div class="fx-row">
+      <label for="fxJpy">¥</label>
+      <input type="number" id="fxJpy" inputmode="decimal" placeholder="日圓金額" min="0">
+      <span class="fx-eq">≈ NT$</span>
+      <span class="fx-result" id="fxResult">—</span>
+    </div>
+    <div class="fx-rate-row">
+      <label for="fxRate">匯率（1 日圓 = ? 台幣）</label>
+      <input type="number" id="fxRate" inputmode="decimal" step="0.001" value="0.21">
+    </div>
+    <div class="fx-note">預設0.21為參考值，出發前可依當時匯率手動修改；修改後會記住（離線瀏覽器）。</div>
+  </section>
+  <!-- 記帳 -->
+  <section class="expense-card">
+    <h2>💰 記帳（A／B／共同）</h2>
+    <div class="exp-form">
+      <select id="expPerson">
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="共同">共同</option>
+      </select>
+      <select id="expCategory">
+        <option>餐飲</option>
+        <option>交通</option>
+        <option>購物</option>
+        <option>門票</option>
+        <option>其他</option>
+      </select>
+      <input type="number" id="expAmount" inputmode="decimal" placeholder="金額 ¥" min="0">
+      <input type="text" id="expNote" placeholder="備註（選填）">
+      <button type="button" class="exp-add-btn" id="expAdd">新增</button>
+    </div>
+    <div class="exp-summary">
+      <div class="exp-sum-item"><span>A</span><b id="sumW">¥0</b><em id="sumWTwd">≈NT$0</em></div>
+      <div class="exp-sum-item"><span>B</span><b id="sumM">¥0</b><em id="sumMTwd">≈NT$0</em></div>
+      <div class="exp-sum-item"><span>共同</span><b id="sumShared">¥0</b><em id="sumSharedTwd">≈NT$0</em></div>
+      <div class="exp-sum-item total"><span>總計</span><b id="sumTotal">¥0</b><em id="sumTotalTwd">≈NT$0</em></div>
+    </div>
+    <div class="exp-bar" id="expBar"></div>
+    <ul class="exp-list" id="expList"></ul>
+    <div class="fx-note">台幣換算採用上方「匯率速算」的匯率（可自行調整），僅供參考。記帳資料儲存在本機瀏覽器，離線開啟或下載後可正常保存；沙盒預覽模式可能無法保存，重新整理會清空。</div>
+  </section>
+</section>
+
+</main>
+
+<!-- 底部導航列 -->
+<nav class="bottom-nav" aria-label="主要功能">
+  <button type="button" class="nav-item active" data-view="view-itinerary"><span class="ni-icon">📅</span><span class="ni-label">每日行程</span></button>
+  <button type="button" class="nav-item" data-view="view-transport"><span class="ni-icon">🚌</span><span class="ni-label">交通</span></button>
+  <button type="button" class="nav-item" data-view="view-lodging"><span class="ni-icon">🏨</span><span class="ni-label">住宿</span></button>
+  <button type="button" class="nav-item" data-view="view-packing"><span class="ni-icon">🧳</span><span class="ni-label">行李</span></button>
+  <button type="button" class="nav-item" data-view="view-budget"><span class="ni-icon">💰</span><span class="ni-label">預算</span></button>
+</nav>
+</div>
+
+<button id="backTop" type="button" aria-label="回到頂部">↑</button>
+<button id="leafToggle" type="button" aria-label="開關飄落楓葉">🍁</button>
+
+<script>
+  // ---------- 底部導航：切換5個主要頁面 ----------
+  var navItems = document.querySelectorAll('.nav-item');
+  var views = document.querySelectorAll('.view');
+  function switchView(id){
+    views.forEach(function(v){ v.classList.toggle('active', v.id === id); });
+    navItems.forEach(function(n){ n.classList.toggle('active', n.dataset.view === id); });
+    window.scrollTo({top:0, behavior:'auto'});
+  }
+  navItems.forEach(function(n){
+    n.addEventListener('click', function(){ switchView(n.dataset.view); });
+  });
+
+  // ---------- 每日行程：分頁切換（顯示/隱藏，不再依賴捲動觀察） ----------
+  var tabs = document.querySelectorAll('.tab');
+  var days = document.querySelectorAll('.day');
+  var tabMap = {};
+  tabs.forEach(function(t){ tabMap[t.dataset.target] = t; });
+
+  function switchDay(id){
+    days.forEach(function(d){ d.classList.toggle('active', d.id === id); });
+    tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.target === id); });
+    var activeTab = tabMap[id];
+    if(activeTab){ activeTab.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'}); }
+  }
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(e){
+      e.preventDefault();
+      switchDay(tab.dataset.target);
+    });
+  });
+
+  // ---------- 倒數計時 ----------
+  // 出發時間：2026/10/31 08:25（本地時間）
+  var departAt = new Date(2026, 9, 31, 8, 25, 0);
+  var tripEnd  = new Date(2026, 10, 7, 23, 59, 59); // 11/7 回程日結束
+  var cdValue = document.getElementById('cdValue');
+
+  function renderCountdown(){
+    var now = new Date();
+    if(now > tripEnd){
+      cdValue.innerHTML = '旅程已結束，期待下次再會 🎏';
+      return;
+    }
+    if(now >= departAt){
+      cdValue.innerHTML = '旅程進行中 ✈️ 玩得開心！';
+      return;
+    }
+    var diff = departAt - now;
+    var d = Math.floor(diff / 86400000);
+    var h = Math.floor(diff % 86400000 / 3600000);
+    var m = Math.floor(diff % 3600000 / 60000);
+    cdValue.innerHTML = '距離出發還有 <b>' + d + '</b> 天 <b>' + h + '</b> 時 <b>' + m + '</b> 分';
+  }
+  renderCountdown();
+  setInterval(renderCountdown, 30000); // 每 30 秒更新，分鐘數不會漂移太久
+
+  // ---------- 當日行程自動高亮 + 決定預設開啟的分頁 ----------
+  // 對應表：日期字串(當地時間) -> day section id
+  var dayDates = {
+    '2026-10-31':'day1',
+    '2026-11-01':'day2',
+    '2026-11-02':'day3',
+    '2026-11-03':'day4',
+    '2026-11-04':'day5',
+    '2026-11-05':'day6',
+    '2026-11-06':'day7',
+    '2026-11-07':'day8'
+  };
+  function localDateStr(dt){
+    var y = dt.getFullYear();
+    var mo = String(dt.getMonth()+1).padStart(2,'0');
+    var da = String(dt.getDate()).padStart(2,'0');
+    return y + '-' + mo + '-' + da;
+  }
+  var todayId = dayDates[localDateStr(new Date())];
+
+  // 預設顯示：App一開啟先停在「每日行程」頁，若今天剛好在行程範圍內就直接開今天，否則開Day1
+  switchView('view-itinerary');
+  switchDay(todayId || 'day1');
+
+  if(todayId){
+    // 1) 行程卡標題加「今天」徽章
+    var todaySection = document.getElementById(todayId);
+    var head = todaySection.querySelector('.day-head h3');
+    var badge = document.createElement('span');
+    badge.className = 'today-badge';
+    badge.textContent = '今天';
+    head.appendChild(badge);
+
+    // 2) 對應分頁加提示小點
+    var todayTab = tabMap[todayId];
+    if(todayTab){
+      var dot = document.createElement('span');
+      dot.className = 'today-dot';
+      todayTab.appendChild(dot);
+    }
+
+    // 3) 「現在進行到哪」指示：優先標記進行中的項目，否則標記最近已開始的一站
+    (function(){
+      var now = new Date();
+      var nowMin = now.getHours() * 60 + now.getMinutes();
+      var stops = todaySection.querySelectorAll('.stop');
+      var running = null, lastStarted = null;
+      stops.forEach(function(stop){
+        var times = (stop.querySelector('.stop-time').textContent.match(/\d{1,2}:\d{2}/g) || []);
+        if(!times.length) return;
+        var p = times[0].split(':');
+        var start = parseInt(p[0],10)*60 + parseInt(p[1],10);
+        var end = start + 60;
+        if(times.length > 1){
+          var q = times[times.length-1].split(':');
+          end = Math.max(parseInt(q[0],10)*60 + parseInt(q[1],10), start + 1);
+        }
+        if(nowMin >= start){ lastStarted = stop; }
+        if(nowMin >= start && nowMin < end){ running = stop; }
+      });
+      var target = running || lastStarted;
+      if(target){
+        target.classList.add('now');
+        var chip = document.createElement('span');
+        chip.className = 'now-chip';
+        chip.textContent = '現在';
+        target.querySelector('.stop-head').appendChild(chip);
+      }
+    })();
+  }
+  // ---------- 下一站導航鈕 ----------
+  // 由每個時間軸上已寫死的地圖連結，自動產生「導航去下一站」路線連結
+  document.querySelectorAll('.timeline').forEach(function(tl){
+    var stops = tl.querySelectorAll('.stop');
+    for(var i = 0; i < stops.length - 1; i++){
+      var cur = stops[i].querySelector('.map-btn');
+      var next = stops[i+1].querySelector('.map-btn');
+      if(!cur || !next) continue;
+      try{
+        var origin = new URL(cur.href).searchParams.get('destination');
+        var dest = new URL(next.href).searchParams.get('destination');
+        if(!origin || !dest || origin === dest) continue;
+        var a = document.createElement('a');
+        a.className = 'nav-btn';
+        a.href = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(origin) + '&destination=' + encodeURIComponent(dest);
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = '🧭 導航去下一站';
+        cur.insertAdjacentElement('afterend', a);
+      }catch(e){}
+    }
+  });
+
+  // ---------- 每站名稱一鍵複製 ----------
+  document.querySelectorAll('.stop').forEach(function(stop){
+    var mapBtn = stop.querySelector('.map-btn');
+    var nameEl = stop.querySelector('.stop-body h4');
+    if(!mapBtn || !nameEl) return;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 複製名稱';
+    btn.addEventListener('click', function(){
+      var text = nameEl.textContent.trim();
+      function done(){
+        btn.textContent = '✓ 已複製';
+        btn.classList.add('copied');
+        setTimeout(function(){ btn.textContent = '📋 複製名稱'; btn.classList.remove('copied'); }, 1600);
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
+      }else{
+        fallbackCopy(text, done);
+      }
+    });
+    mapBtn.insertAdjacentElement('afterend', btn);
+  });
+  function fallbackCopy(text, done){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand('copy'); done(); }catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  // ---------- 共用：取得目前設定的匯率（記帳台幣換算會用到） ----------
+  function getFxRate(){
+    var r = document.getElementById('fxRate');
+    var v = r ? parseFloat(r.value) : NaN;
+    return (!isNaN(v) && v > 0) ? v : 0.21;
+  }
+
+  // ---------- 匯率速算器 ----------
+  (function(){
+    var jpy = document.getElementById('fxJpy');
+    var rate = document.getElementById('fxRate');
+    var out = document.getElementById('fxResult');
+    if(!jpy || !rate || !out) return;
+    try{
+      var saved = localStorage.getItem('fxRate');
+            if(saved && !isNaN(parseFloat(saved))) rate.value = saved;
+    }catch(e){}
+    function calc(){
+      var j = parseFloat(jpy.value);
+      var r = parseFloat(rate.value);
+      out.textContent = (!isNaN(j) && !isNaN(r)) ? Math.round(j * r).toLocaleString() : '—';
+    }
+    jpy.addEventListener('input', calc);
+    rate.addEventListener('input', function(){
+      calc();
+      try{ localStorage.setItem('fxRate', rate.value); }catch(e){}
+      if(typeof window.renderExpenses === 'function'){ window.renderExpenses(); }
+    });
+  })();
+
+  // ---------- Checklist 勾選記憶 ----------
+  (function(){
+    var boxes = document.querySelectorAll('.check-item input[type="checkbox"]');
+    if(!boxes.length) return;
+    try{
+      var saved = JSON.parse(localStorage.getItem('checklistState') || '[]');
+      boxes.forEach(function(box, i){ if(saved[i]) box.checked = true; });
+    }catch(e){}
+    boxes.forEach(function(box){
+      box.addEventListener('change', function(){
+        try{
+          var state = [];
+          boxes.forEach(function(b){ state.push(b.checked); });
+          localStorage.setItem('checklistState', JSON.stringify(state));
+        }catch(e){}
+      });
+    });
+  })();
+
+  // ---------- 回到頂部 ----------
+  (function(){
+    var btn = document.getElementById('backTop');
+    if(!btn) return;
+    window.addEventListener('scroll', function(){
+      btn.classList.toggle('show', window.scrollY > 600);
+    }, {passive:true});
+    btn.addEventListener('click', function(){
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  })();
+
+  // ---------- 每日時間軸尺標（06:00–23:00，整點刻度） ----------
+  document.querySelectorAll('.hour-ruler').forEach(function(ruler){
+    var track = document.createElement('div');
+    track.className = 'hr-track';
+    for(var h = 6; h <= 23; h++){
+      var tick = document.createElement('span');
+      tick.className = 'hr-tick';
+      tick.dataset.hour = h;
+      var i = document.createElement('i');
+      tick.appendChild(i);
+      if(h % 3 === 0){
+        var b = document.createElement('b');
+        b.textContent = (h < 10 ? '0' : '') + h;
+        tick.appendChild(b);
+      }
+      track.appendChild(tick);
+    }
+    ruler.appendChild(track);
+    var dayId = ruler.dataset.day;
+    var section = document.getElementById(dayId);
+    if(!section) return;
+    var stopTimes = section.querySelectorAll('.stop-time');
+    stopTimes.forEach(function(st){
+      var m = st.textContent.match(/(\d{1,2}):(\d{2})/);
+      if(!m) return;
+      var hour = parseInt(m[1], 10);
+      if(hour < 6) hour = 6;
+      if(hour > 23) hour = 23;
+      var tickEl = track.querySelector('.hr-tick[data-hour="' + hour + '"]');
+      if(tickEl) tickEl.classList.add('has-activity');
+    });
+  });
+
+  // ---------- 天氣顯示（Open-Meteo，無需API金鑰；此為漸進增強功能） ----------
+  function wxIcon(code){
+    if(code === 0) return '☀️';
+    if(code >= 1 && code <= 3) return '⛅';
+    if(code === 45 || code === 48) return '🌫';
+    if(code >= 51 && code <= 67) return '🌧';
+    if(code >= 71 && code <= 77) return '❄️';
+    if(code >= 80 && code <= 82) return '🌦';
+    if(code >= 95) return '⛈';
+    return '🌡';
+  }
+  function loadWeather(elId, lat, lon, dateStr){
+    var el = document.getElementById(elId);
+    if(!el) return;
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo&forecast_days=16')
+      .then(function(r){ if(!r.ok) throw new Error('bad response'); return r.json(); })
+      .then(function(data){
+        var idx = (data.daily && data.daily.time) ? data.daily.time.indexOf(dateStr) : -1;
+        if(idx === -1) throw new Error('date out of forecast range');
+        var code = data.daily.weathercode[idx];
+        var tmax = Math.round(data.daily.temperature_2m_max[idx]);
+        var tmin = Math.round(data.daily.temperature_2m_min[idx]);
+        el.textContent = wxIcon(code) + ' ' + tmin + '°–' + tmax + '°C';
+      })
+      .catch(function(){
+        el.textContent = '☁️ 天氣預報將於出發前約7天顯示';
+      });
+  }
+  // 座標：河口湖 35.5019,138.7585／東京 35.6895,139.6917／橫濱 35.4437,139.6380／淺草 35.7148,139.7967／池袋 35.7295,139.7109／新宿 35.6938,139.7036／成田 35.7720,140.3929
+  loadWeather('wxDay1', 35.5019, 138.7585, '2026-10-31');
+  loadWeather('wxDay2', 35.5019, 138.7585, '2026-11-01');
+  loadWeather('wxDay3', 35.6895, 139.6917, '2026-11-02');
+  loadWeather('wxDay4', 35.4437, 139.6380, '2026-11-03');
+  loadWeather('wxDay5', 35.7148, 139.7967, '2026-11-04');
+  loadWeather('wxDay6', 35.7295, 139.7109, '2026-11-05');
+  loadWeather('wxDay7', 35.6938, 139.7036, '2026-11-06');
+  loadWeather('wxDay8', 35.7720, 140.3929, '2026-11-07');
+
+  // ---------- 快速統計：已排景點數 ----------
+  (function(){
+    var qsSpots = document.getElementById('qsSpots');
+    if(qsSpots){ qsSpots.textContent = document.querySelectorAll('.tag-景點').length; }
+  })();
+
+  // ---------- 記帳（A／B／共同） ----------
+  (function(){
+    var STORAGE_KEY = 'expenseEntries';
+    var entries = [];
+    try{ entries = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }catch(e){ entries = []; }
+    var catColors = {'餐飲':'#b5573f','交通':'#7e9aa8','購物':'#8fa998','門票':'#c9a876','其他':'#a8998b'};
+
+    function save(){
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }catch(e){}
+    }
+
+    function render(){
+      var list = document.getElementById('expList');
+      if(!list) return;
+      list.innerHTML = '';
+      if(!entries.length){
+        var empty = document.createElement('div');
+        empty.className = 'exp-empty';
+        empty.textContent = '目前還沒有記帳項目';
+        list.appendChild(empty);
+      }
+      var sums = {A:0, B:0};
+      sums['共同'] = 0;
+      var catSums = {};
+      entries.forEach(function(en, i){
+        sums[en.person] = (sums[en.person] || 0) + en.amount;
+        catSums[en.category] = (catSums[en.category] || 0) + en.amount;
+        var li = document.createElement('li');
+        li.className = 'exp-item';
+        var tagSpan = document.createElement('span');
+        tagSpan.className = 'exp-tag';
+        tagSpan.style.background = catColors[en.category] || '#999';
+        tagSpan.textContent = en.category;
+        var personSpan = document.createElement('span');
+        personSpan.className = 'exp-person';
+        personSpan.textContent = en.person;
+        var noteSpan = document.createElement('span');
+        noteSpan.className = 'exp-note';
+        noteSpan.textContent = en.note || '';
+        var amtWrap = document.createElement('span');
+        amtWrap.className = 'exp-amt-wrap';
+        var amtSpan = document.createElement('span');
+        amtSpan.className = 'exp-amt';
+        amtSpan.textContent = '¥' + en.amount.toLocaleString();
+        var twdSpan = document.createElement('span');
+        twdSpan.className = 'exp-twd';
+        twdSpan.textContent = '≈NT$' + Math.round(en.amount * getFxRate()).toLocaleString();
+        amtWrap.appendChild(amtSpan);
+        amtWrap.appendChild(twdSpan);
+        var delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'exp-del';
+        delBtn.textContent = '✕';
+        delBtn.addEventListener('click', function(){
+          entries.splice(i, 1);
+          save();
+          render();
+        });
+        li.appendChild(tagSpan);
+        li.appendChild(personSpan);
+        li.appendChild(noteSpan);
+        li.appendChild(amtWrap);
+        li.appendChild(delBtn);
+        list.appendChild(li);
+      });
+      var rate = getFxRate();
+      var wJpy = sums.A || 0, mJpy = sums.B || 0, sharedJpy = sums['共同'] || 0;
+      document.getElementById('sumW').textContent = '¥' + wJpy.toLocaleString();
+      document.getElementById('sumWTwd').textContent = '≈NT$' + Math.round(wJpy * rate).toLocaleString();
+      document.getElementById('sumM').textContent = '¥' + mJpy.toLocaleString();
+      document.getElementById('sumMTwd').textContent = '≈NT$' + Math.round(mJpy * rate).toLocaleString();
+      document.getElementById('sumShared').textContent = '¥' + sharedJpy.toLocaleString();
+      document.getElementById('sumSharedTwd').textContent = '≈NT$' + Math.round(sharedJpy * rate).toLocaleString();
+      var total = wJpy + mJpy + sharedJpy;
+      document.getElementById('sumTotal').textContent = '¥' + total.toLocaleString();
+      document.getElementById('sumTotalTwd').textContent = '≈NT$' + Math.round(total * rate).toLocaleString();
+      var qsBudget = document.getElementById('qsBudget');
+      if(qsBudget){ qsBudget.textContent = '¥' + total.toLocaleString(); }
+      var bar = document.getElementById('expBar');
+      bar.innerHTML = '';
+      if(total > 0){
+        Object.keys(catSums).forEach(function(c){
+          var seg = document.createElement('div');
+          seg.className = 'exp-bar-seg';
+          seg.style.width = (catSums[c] / total * 100) + '%';
+          seg.style.background = catColors[c] || '#999';
+          seg.title = c + ' ¥' + catSums[c].toLocaleString();
+          bar.appendChild(seg);
+        });
+      }
+    }
+
+    var addBtn = document.getElementById('expAdd');
+    if(addBtn){
+      addBtn.addEventListener('click', function(){
+        var person = document.getElementById('expPerson').value;
+        var category = document.getElementById('expCategory').value;
+        var amount = parseFloat(document.getElementById('expAmount').value);
+        var note = document.getElementById('expNote').value.trim();
+        if(isNaN(amount) || amount <= 0) return;
+        entries.push({person:person, category:category, amount:amount, note:note});
+        save();
+        document.getElementById('expAmount').value = '';
+        document.getElementById('expNote').value = '';
+        render();
+      });
+    }
+    window.renderExpenses = render;
+    render();
+  })();
+
+  // ---------- 動態飄落楓葉 ----------
+  (function(){
+    var container = document.getElementById('mapleLeaves');
+    var toggleBtn = document.getElementById('leafToggle');
+    if(!container || !toggleBtn) return;
+    var emojis = ['🍁','🍂'];
+    var swayVariants = ['leafFallA','leafFallB','leafFallC'];
+    var LEAF_COUNT = 16;
+    var leafEls = [];
+
+    function buildLeaves(){
+      container.innerHTML = '';
+      leafEls = [];
+      for(var i = 0; i < LEAF_COUNT; i++){
+        var leaf = document.createElement('span');
+        leaf.className = 'maple-leaf';
+        leaf.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        var size = 14 + Math.random() * 14;
+        var duration = 9 + Math.random() * 9;
+        var delay = -Math.random() * duration;
+        var left = Math.random() * 100;
+        var opacity = 0.5 + Math.random() * 0.4;
+        var anim = swayVariants[Math.floor(Math.random() * swayVariants.length)];
+        leaf.style.left = left + 'vw';
+        leaf.style.fontSize = size + 'px';
+        leaf.style.opacity = opacity;
+        leaf.style.animationName = anim;
+        leaf.style.animationDuration = duration + 's';
+        leaf.style.animationDelay = delay + 's';
+        container.appendChild(leaf);
+        leafEls.push(leaf);
+      }
+    }
+
+    var ON_KEY = 'mapleLeavesOn';
+    var enabled = true;
+    try{
+      var saved = localStorage.getItem(ON_KEY);
+      if(saved !== null) enabled = saved === '1';
+    }catch(e){}
+
+    function applyState(){
+      container.style.display = enabled ? 'block' : 'none';
+      toggleBtn.classList.toggle('off', !enabled);
+    }
+
+    buildLeaves();
+    applyState();
+
+    toggleBtn.addEventListener('click', function(){
+      enabled = !enabled;
+      applyState();
+      try{ localStorage.setItem(ON_KEY, enabled ? '1' : '0'); }catch(e){}
+    });
+  })();
+</script>
+</body>
+</html>
