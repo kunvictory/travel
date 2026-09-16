@@ -232,3 +232,300 @@
   .copy-btn{color:var(--gold);border:1.4px solid var(--gold);background:none;font-family:inherit;}
   .copy-btn:hover,.copy-btn:focus-visible{background:var(--gold);color:#fff;}
   .copy-btn.copied{background:var(--gold);color:#fff;}
+  .exp-sum-item b{font-size:14px;color:var(--ink);font-weight:800;display:block;}
+  .exp-sum-item em{display:block;font-size:10px;font-style:normal;color:var(--muted);margin-top:1px;}
+  .exp-sum-item.total{background:#f0e6d6;}
+  .exp-bar{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--tabbg);margin-bottom:14px;}
+  .exp-bar-seg{height:100%;}
+  .exp-list{list-style:none;margin:0;padding:0;max-height:280px;overflow-y:auto;}
+  .exp-item{display:flex;align-items:center;gap:8px;padding:9px 0;border-top:1px dashed var(--line);font-size:12.5px;}
+  .exp-item:first-child{border-top:none;}
+  .exp-tag{font-size:10px;font-weight:700;color:#fff;padding:2px 7px;border-radius:999px;flex:0 0 auto;}
+  .exp-person{font-weight:700;color:var(--ink);flex:0 0 auto;width:28px;}
+  .exp-note{flex:1;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .exp-amt-wrap{flex:0 0 auto;text-align:right;}
+  .exp-amt{font-weight:700;color:var(--ink);display:block;}
+  .exp-twd{font-size:10px;color:var(--muted);display:block;margin-top:1px;}
+  .exp-del{appearance:none;border:none;background:none;color:var(--muted-soft);cursor:pointer;font-size:14px;flex:0 0 auto;padding:0 2px;}
+  .exp-del:hover{color:var(--red);}
+  .exp-empty{text-align:center;color:var(--muted);font-size:12.5px;padding:14px 0;}
+
+  /* ---------- 動態飄落楓葉 ---------- */
+  .maple-leaves{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:55;}
+  .maple-leaf{position:absolute;top:-8%;will-change:transform,opacity;animation-timing-function:linear;animation-iteration-count:infinite;user-select:none;line-height:1;filter:drop-shadow(0 2px 2px rgba(58,38,32,.12));}
+  @keyframes leafFallA{
+    0%{transform:translate(0,-10vh) rotate(0deg);}
+    20%{transform:translate(28px,14vh) rotate(80deg);}
+    40%{transform:translate(-18px,34vh) rotate(160deg);}
+    60%{transform:translate(24px,54vh) rotate(240deg);}
+    80%{transform:translate(-22px,78vh) rotate(320deg);}
+    100%{transform:translate(10px,108vh) rotate(400deg);}
+  }
+  @keyframes leafFallB{
+    0%{transform:translate(0,-10vh) rotate(10deg);}
+    25%{transform:translate(-32px,20vh) rotate(-70deg);}
+    50%{transform:translate(20px,44vh) rotate(120deg);}
+    75%{transform:translate(-28px,74vh) rotate(-200deg);}
+    100%{transform:translate(14px,108vh) rotate(300deg);}
+  }
+  @keyframes leafFallC{
+    0%{transform:translate(0,-10vh) rotate(-15deg);}
+    30%{transform:translate(24px,24vh) rotate(100deg);}
+    60%{transform:translate(-28px,58vh) rotate(-150deg);}
+    100%{transform:translate(18px,108vh) rotate(280deg);}
+  }
+  #leafToggle{
+    position:fixed;right:16px;bottom:calc(80px + env(safe-area-inset-bottom));z-index:90;
+    width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;
+    background:var(--red);color:#fff;font-size:19px;line-height:1;
+    box-shadow:0 6px 18px rgba(51,48,44,.2);
+    -webkit-tap-highlight-color:transparent;
+    transition:transform .15s ease,opacity .2s ease;
+  }
+  #leafToggle:active{transform:scale(.92);}
+  #leafToggle.off{opacity:.45;}
+  @media (prefers-reduced-motion: reduce){
+    .maple-leaves{display:none;}
+  }
+  #backTop{
+    position:fixed;right:16px;bottom:calc(136px + env(safe-area-inset-bottom));z-index:90;
+    width:44px;height:44px;border-radius:50%;border:1px solid var(--line);cursor:pointer;
+    background:var(--card);color:var(--ink);font-size:19px;
+    box-shadow:0 6px 18px rgba(51,48,44,.15);
+    opacity:0;pointer-events:none;transition:opacity .25s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #backTop.show{opacity:1;pointer-events:auto;}
+
+  /* ---------- print ---------- */
+  @media print{
+    body,.app{background:#fff;}
+    .tabs-wrap,.countdown,.map-btn,.nav-btn,.copy-btn,#backTop,.fx-card,.expense-card,footer{display:none !important;}
+    .hero{padding:10px 0;}
+    .day{padding:14px 0 4px;page-break-inside:avoid;}
+    .day-card,.checklist{box-shadow:none;border:1px solid #ddd;}
+    .day-head{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .timeline:before{background:#ccc;}
+    .stop{page-break-inside:avoid;}
+    .hour-ruler{display:none;}
+  }
+
+  footer{padding:34px 20px 46px;text-align:center;color:var(--muted);font-size:11.5px;line-height:1.8;}
+  footer b{color:var(--ink);}
+
+  /* ---------- App shell / 底部導航 ---------- */
+  html,body{height:100%;}
+  .app{padding-bottom:calc(70px + env(safe-area-inset-bottom));}
+  .view{display:none;}
+  .view.active{display:block;animation:viewFade .2s ease;}
+  @keyframes viewFade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .page-header{padding:22px 20px 4px;}
+  .page-header .ph-eyebrow{font-size:11px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;}
+  .page-header h2{font-size:22px;font-weight:900;margin:6px 0 4px;color:var(--ink);}
+  .page-header p{margin:0 0 4px;font-size:13px;color:var(--ink2);line-height:1.6;}
+
+  .bottom-nav{
+    position:fixed;left:0;right:0;bottom:0;z-index:80;
+    max-width:560px;margin:0 auto;
+    background:var(--tabbg);border-top:1px solid var(--line);
+    display:flex;align-items:stretch;
+    box-shadow:0 -6px 18px rgba(58,38,32,.08);
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .nav-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    appearance:none;border:none;background:none;cursor:pointer;font-family:inherit;
+    padding:9px 2px 8px;color:var(--muted);
+    -webkit-tap-highlight-color:transparent;
+    position:relative;
+  }
+  .nav-item .ni-icon{font-size:20px;line-height:1;transition:transform .15s ease;}
+  .nav-item .ni-label{font-size:10px;font-weight:600;letter-spacing:.01em;}
+  .nav-item.active{color:var(--red);}
+  .nav-item.active .ni-icon{transform:translateY(-2px);}
+  .nav-item.active:after{
+    content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);
+    width:16px;height:3px;border-radius:999px;background:var(--red);
+  }
+  .nav-item:active{opacity:.7;}
+
+  /* ---------- 住宿卡片 ---------- */
+  .lodging-card{margin:14px 16px 8px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;box-shadow:0 6px 18px rgba(51,48,44,.06);}
+  .lodging-card .lc-head{background:var(--dayhead);padding:16px 18px;color:#f9f4ef;}
+  .lodging-card .lc-head .lc-tag{font-size:11px;letter-spacing:.04em;color:var(--accent,#e0a458);font-weight:700;}
+  .lodging-card .lc-head h3{margin:6px 0 0;font-size:18px;font-weight:800;}
+  .lodging-card .lc-body{padding:14px 18px 18px;}
+  .lodging-card .lc-row{display:flex;gap:8px;font-size:13px;color:var(--ink2);padding:6px 0;border-top:1px dashed var(--line);}
+  .lodging-card .lc-row:first-child{border-top:none;}
+  .lodging-card .lc-row b{flex:0 0 64px;color:var(--muted);font-weight:600;font-size:11.5px;padding-top:1px;}
+  .lodging-card .lc-nav{
+    display:inline-flex;align-items:center;gap:6px;margin-top:12px;
+    font-size:13px;font-weight:700;color:#fff;background:var(--red);
+    padding:9px 16px;border-radius:999px;text-decoration:none;
+  }
+  .lodging-note{margin:4px 16px 18px;background:var(--tabbg);border-left:3px solid var(--gold);
+    border-radius:0 10px 10px 0;padding:11px 13px;font-size:12.5px;color:var(--ink2);line-height:1.6;}
+
+  /* ---------- 交通頁 ---------- */
+  .transport-day{margin:14px 16px 8px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px 16px 16px;box-shadow:0 6px 18px rgba(51,48,44,.05);}
+  .transport-day h3{font-size:14px;font-weight:800;margin:0 0 4px;color:var(--ink);display:flex;align-items:center;gap:6px;}
+  .transport-day .td-date{font-size:11px;color:var(--muted);margin-bottom:10px;}
+  .t-seg{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-top:1px dashed var(--line);}
+  .t-seg:first-child{border-top:none;}
+  .t-seg .t-icon{font-size:16px;flex:0 0 auto;padding-top:1px;}
+  .t-seg .t-info{flex:1;min-width:0;}
+  .t-seg .t-route{font-size:13px;font-weight:700;color:var(--ink);}
+  .t-seg .t-detail{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.5;}
+  .t-nav-btn{
+    flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;
+    font-size:11px;font-weight:700;color:var(--red);border:1.3px solid var(--red);
+    padding:5px 10px;border-radius:999px;text-decoration:none;margin-left:6px;white-space:nowrap;
+  }
+
+  /* ---------- 預算頁 ---------- */
+  .budget-day{margin:12px 16px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:12px 15px;box-shadow:0 4px 12px rgba(51,48,44,.04);}
+  .budget-day .bd-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+  .budget-day .bd-day{font-size:12.5px;font-weight:800;color:var(--ink);}
+  .budget-day .bd-amt{font-size:13.5px;font-weight:800;color:var(--red);}
+  .budget-day .bd-desc{font-size:11.5px;color:var(--muted);line-height:1.6;}
+  .budget-total{margin:16px 16px 6px;background:#f0e6d6;border-radius:12px;padding:14px 16px;
+    display:flex;justify-content:space-between;align-items:center;}
+  .budget-total span{font-size:12.5px;color:var(--ink2);font-weight:700;}
+  .budget-total b{font-size:19px;color:var(--red);}
+
+  @media print{ .bottom-nav,#leafToggle,#backTop{display:none !important;} .view{display:block !important;} }
+</style>
+</head>
+<body>
+<div class="maple-leaves" id="mapleLeaves" aria-hidden="true"></div>
+<div class="app">
+<main>
+<!-- ============ VIEW 1: 每日行程 ============ -->
+<section class="view active" id="view-itinerary">
+  <!-- Sticky day tabs -->
+  <nav class="tabs-wrap" aria-label="日期導覽">
+    <div class="tabs-inner" id="tabsInner">
+      <button type="button" class="tab" data-target="day1" style="--accent:var(--d1)"><span class="dot"></span><span class="d-num">DAY 1</span><span class="d-date">10/31 六</span></button>
+      <button type="button" class="tab" data-target="day2" style="--accent:var(--d2)"><span class="dot"></span><span class="d-num">DAY 2</span><span class="d-date">11/01 日</span></button>
+      <button type="button" class="tab" data-target="day3" style="--accent:var(--d3)"><span class="dot"></span><span class="d-num">DAY 3</span><span class="d-date">11/02 一</span></button>
+      <button type="button" class="tab" data-target="day4" style="--accent:var(--d4)"><span class="dot"></span><span class="d-num">DAY 4</span><span class="d-date">11/03 二</span></button>
+      <button type="button" class="tab" data-target="day5" style="--accent:var(--d5)"><span class="dot"></span><span class="d-num">DAY 5</span><span class="d-date">11/04 三</span></button>
+      <button type="button" class="tab" data-target="day6" style="--accent:var(--d6)"><span class="dot"></span><span class="d-num">DAY 6</span><span class="d-date">11/05 四</span></button>
+      <button type="button" class="tab" data-target="day7" style="--accent:var(--d7)"><span class="dot"></span><span class="d-num">DAY 7</span><span class="d-date">11/06 五</span></button>
+      <button type="button" class="tab" data-target="day8" style="--accent:var(--d8)"><span class="dot"></span><span class="d-num">DAY 8</span><span class="d-date">11/07 六</span></button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-eyebrow">🍁 KAWAGUCHIKO・TOKYO・YOKOHAMA ■ 2026.10.31(六) → 11.07(六)</div>
+    <h1>🍁 楓葉富士山・楓葉東京 8天7夜</h1>
+    <p class="sub">前兩天在河口湖賞楓、遠眺富士山；接著轉戰東京市區與橫濱，滿街紅葉銀杏中散步逛街，最後一天輕鬆逛表參道再回家 🍂✈️</p>
+
+    <div class="quick-stats">
+      <div class="qs-item"><b>8 天 7 夜</b><span>天數</span></div>
+      <div class="qs-item"><b id="qsSpots">–</b><span>已排景點</span></div>
+      <div class="qs-item"><b id="qsBudget">¥0</b><span>目前記帳總額</span></div>
+    </div>
+
+    <div class="countdown" id="countdown">
+      <div class="cd-label">🍁 Countdown to Momiji Season</div>
+      <div class="cd-value" id="cdValue">計算中…</div>
+      <div class="cd-note">出發：2026/10/31（六）08:25 起飛</div>
+    </div>
+    <div class="legend">
+      <span><i style="--c:var(--d1)"></i>抵達・河口湖</span>
+      <span><i style="--c:var(--d2)"></i>富士山周邊</span>
+      <span><i style="--c:var(--d3)"></i>東京市區</span>
+      <span><i style="--c:var(--d4)"></i>橫濱一日遊</span>
+      <span><i style="--c:var(--d5)"></i>淺草晴空塔</span>
+      <span><i style="--c:var(--d6)"></i>池袋</span>
+      <span><i style="--c:var(--d7)"></i>自由活動</span>
+      <span><i style="--c:var(--d8)"></i>回家</span>
+    </div>
+  </section>
+
+  <!-- DAY 1 -->
+  <section class="day" id="day1" style="--accent:var(--d1)">
+    <div class="day-card">
+      <div class="day-head">
+        <div class="num">DAY 1</div>
+        <div class="date">10/31（六）</div>
+        <h3>抵達日本・包車前往河口湖賞楓富士山</h3>
+        <div class="day-meta">
+          <span>🏨 HAOSTAY 河口湖</span>
+          <span>🚗 機場包車約3.5H</span>
+          <span class="wx-badge" id="wxDay1">🌡 讀取天氣中…</span>
+        </div>
+      </div>
+      <div class="route-chips">
+        <b>機場</b><span class="arrow">›</span><b>包車</b><span class="arrow">›</span><b>HAOSTAY河口湖</b><span class="arrow">›</span><b>晚餐</b><span class="arrow">›</span><b>超市</b>
+      </div>
+      <div class="hour-ruler" data-day="day1"></div>
+      <div class="stat-row">
+        <div>住宿 <b>1</b></div><div>用餐 <b>1</b></div><div>移動 <b>2</b></div><div>購物 <b>1</b></div>
+      </div>
+      <div class="tip"><b>今日提醒　</b>抵達後直接包車前往河口湖，路程較長，建議在機場先解決點心與飲水；晚上就在住宿周邊簡單逛逛，早點休息準備明天環湖。</div>
+      <ul class="timeline">
+        <li class="stop"><div class="stop-time">08:25<br><span>12:35</span></div><div class="stop-dot-wrap"><div class="stop-dot"></div></div>
+          <div class="stop-body"><div class="stop-head"><span class="tag tag-移動">移動</span><h4>搭機抵達日本</h4></div>
+          <p class="stop-addr">請依實際航班確認抵達機場</p>
+          <div class="stop-metaline"><span>✈️ 飛行時間約4hr10</span></div>
+          <a class="map-btn" href="https://www.google.com/maps/dir/?api=1&destination=Narita+Airport" target="_blank" rel="noopener">🧭 開始導航</a></div></li>
+
+        <li class="stop"><div class="stop-time">13:30<br><span>14:00起</span></div><div class="stop-dot-wrap"><div class="stop-dot"></div></div>
+          <div class="stop-body"><div class="stop-head"><span class="tag tag-移動">移動</span><h4>包車前往河口湖 HAOSTAY</h4></div>
+          <p class="stop-addr">〒401-0301 山梨県南都留郡富士河口湖町船津251-4</p>
+          <div class="stop-metaline"><span>🚗 車程約3.5小時</span></div>
+          <a class="map-btn" href="https://www.google.com/maps/dir/?api=1&destination=HAOSTAY+%E6%B2%B3%E5%8F%A3%E6%B9%96" target="_blank" rel="noopener">🧭 開始導航</a></div></li>
+
+        <li class="stop"><div class="stop-time">抵達後</div><div class="stop-dot-wrap"><div class="stop-dot"></div></div>
+          <div class="stop-body"><div class="stop-head"><span class="tag tag-住宿">住宿</span><h4>Check-in HAOSTAY 河口湖</h4></div>
+          <p class="stop-addr">〒401-0301 山梨県南都留郡富士河口湖町船津251-4</p>
+          <div class="stop-metaline"><span>行李放好稍作休息</span></div>
+          <a class="map-btn" href="https://www.google.com/maps/dir/?api=1&destination=HAOSTAY+%E6%B2%B3%E5%8F%A3%E6%B9%96" target="_blank" rel="noopener">🧭 開始導航</a></div></li>
+
+        <li class="stop"><div class="stop-time">17:30<br><span>20:00</span></div><div class="stop-dot-wrap"><div class="stop-dot"></div></div>
+          <div class="stop-body"><div class="stop-head"><span class="tag tag-用餐">用餐</span><h4>Hoto Tempura Wakana（餺飥・天婦羅）</h4></div>
+          <p class="stop-addr">Fujikawaguchiko, Yamanashi, Minamitsuru District</p>
+          <div class="stop-metaline"><span>營業17:30–20:00</span></div>
+          <a class="map-btn" href="https://www.google.com/maps/dir/?api=1&destination=Hoto+Tempura+Wakana+Fujikawaguchiko" target="_blank" rel="noopener">🧭 開始導航</a></div></li>
+
+        <li class="stop"><div class="stop-time">晚餐後</div><div class="stop-dot-wrap"><div class="stop-dot"></div></div>
+          <div class="stop-body"><div class="stop-head"><span class="tag tag-購物">購物</span><h4>OGINO 河口湖店（採買明日早餐/零食）</h4></div>
+          <p class="stop-addr">Ogino Fujikawaguchiko, Yamanashi, Minamitsuru District</p>
+          <div class="stop-metaline"><span>營業09:00–21:00</span></div>
+          <a class="map-btn" href="https://www.google.com/maps/dir/?api=1&destination=Ogino+Fujikawaguchiko" target="_blank" rel="noopener">🧭 開始導航</a></div></li>
+
+        <li class="stop"><div class="stop-time">晚上</div><div class="stop-dot-wrap"><div class="stop-dot"></div></div>
+          <div class="stop-body"><div class="stop-head"><span class="tag tag-移動">移動</span><h4>住宿周邊簡單逛逛</h4></div>
+          <p class="stop-addr">Fujikawaguchiko, Yamanashi</p>
+          <div class="stop-metaline"><span>早點休息，明天環湖</span></div>
+          <a class="map-btn" href="https://www.google.com/maps/dir/?api=1&destination=HAOSTAY+%E6%B2%B3%E5%8F%A3%E6%B9%96" target="_blank" rel="noopener">🧭 開始導航</a></div></li>
+      </ul>
+    </div>
+  </section>
+  <!-- DAY 2 -->
+  <section class="day" id="day2" style="--accent:var(--d2)">
+    <div class="day-card">
+      <div class="day-head">
+        <div class="num">DAY 2</div>
+        <div class="date">11/1（日）</div>
+        <h3>大池公園環湖・富士山楓葉巡禮・移動大久保</h3>
+        <div class="day-meta">
+          <span>🏨 Domo S PATIO新宿201</span>
+          <span>⚠️ 20:00前須抵達</span>
+          <span class="wx-badge" id="wxDay2">🌡 讀取天氣中…</span>
+        </div>
+      </div>
+      <div class="route-chips">
+        <b>HAOSTAY</b><span class="arrow">›</span><b>大池公園</b><span class="arrow">›</span><b>富士山周邊</b><span class="arrow">›</span><b>Domo S新宿</b>
+      </div>
+      <div class="hour-ruler" data-day="day2"></div>
+      <div class="stat-row">
+        <div>用餐 <b>2</b></div><div>景點 <b>2</b></div><div>移動 <b>2</b></div><div>住宿 <b>1</b></div>
+      </div>
