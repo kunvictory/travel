@@ -232,6 +232,69 @@
   .copy-btn{color:var(--gold);border:1.4px solid var(--gold);background:none;font-family:inherit;}
   .copy-btn:hover,.copy-btn:focus-visible{background:var(--gold);color:#fff;}
   .copy-btn.copied{background:var(--gold);color:#fff;}
+
+  /* ---------- "now" indicator ---------- */
+  .stop.now{
+    background:rgba(181,87,63,.08);
+    border-radius:12px;margin:0 -8px;padding-left:8px;padding-right:8px;padding-top:8px;
+  }
+  .stop.now .stop-dot{background:var(--red);box-shadow:0 0 0 2px var(--red),0 0 10px rgba(181,87,63,.5);}
+  .now-chip{
+    display:inline-block;font-size:10px;font-weight:700;
+    background:var(--red);color:#fff;padding:2px 8px;border-radius:999px;
+    animation:pulse 2s ease-in-out infinite;
+  }
+
+  /* ---------- currency converter ---------- */
+  .fx-card,.expense-card{
+    margin:22px 16px 8px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px;box-shadow:0 6px 18px rgba(51,48,44,.05);
+  }
+  .fx-card h2,.expense-card h2{font-size:17px;margin:0 0 12px;color:var(--ink);font-weight:800;}
+  .cost-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:10px;}
+  .cost-table th,.cost-table td{text-align:left;padding:7px 6px;border-bottom:1px dashed var(--line);}
+  .cost-table th{color:var(--muted);font-weight:700;font-size:11px;}
+  .cost-table td.amt{text-align:right;font-weight:700;color:var(--ink);white-space:nowrap;}
+  .cost-table tr.total td{border-top:1.5px solid var(--line);border-bottom:none;font-weight:800;color:var(--red);padding-top:9px;}
+  .fx-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .fx-row label{font-size:12px;color:var(--muted);}
+  .fx-row input{
+    width:110px;padding:9px 11px;border:1.4px solid var(--line);border-radius:10px;
+    font-size:15px;color:var(--ink);
+    background:#fff;outline:none;
+  }
+  .fx-row input:focus{border-color:var(--gold);}
+  .fx-eq{font-size:15px;color:var(--muted);}
+  .fx-result{
+    font-size:19px;font-weight:700;color:var(--red);
+    min-width:100px;
+  }
+  .fx-rate-row{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
+  .fx-rate-row label{font-size:12px;color:var(--muted);}
+  .fx-rate-row input{
+    width:80px;padding:6px 9px;border:1.4px solid var(--line);border-radius:8px;
+    font-size:13px;color:var(--ink);background:#fff;outline:none;
+  }
+  .fx-note{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;}
+
+  /* ---------- expense tracker ---------- */
+  .exp-form{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .exp-form select,.exp-form input{
+    padding:9px 10px;border:1.4px solid var(--line);border-radius:10px;
+    font-size:13px;color:var(--ink);background:#fff;outline:none;font-family:inherit;
+  }
+  .exp-form select{flex:0 0 auto;}
+  .exp-form input[type="number"]{width:90px;}
+  .exp-form input[type="text"]{flex:1;min-width:90px;}
+  .exp-form input:focus,.exp-form select:focus{border-color:var(--gold);}
+  .exp-add-btn{
+    appearance:none;border:none;background:var(--ink);color:#fff;font-family:inherit;
+    padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;
+  }
+  .exp-add-btn:active{opacity:.8;}
+  .exp-summary{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+  .exp-sum-item{flex:1;min-width:70px;background:var(--tabbg);border-radius:10px;padding:9px 6px;text-align:center;}
+  .exp-sum-item span{display:block;font-size:10.5px;color:var(--muted);margin-bottom:3px;}
   .exp-sum-item b{font-size:14px;color:var(--ink);font-weight:800;display:block;}
   .exp-sum-item em{display:block;font-size:10px;font-style:normal;color:var(--muted);margin-top:1px;}
   .exp-sum-item.total{background:#f0e6d6;}
@@ -826,6 +889,303 @@
     <div class="bd-desc">晚餐＋超市採買</div>
   </div>
   <div class="budget-day">
+          <div class="stop-body"><div class="stop-head"><span class="tag tag-購物">購物</span><h4>J!NS 銀座店</h4></div>
+          <p class="stop-addr">J!NS 銀座店, Chuo City, Tokyo</p>
+          <div class="stop-metaline"></div>
+          <a class="map-btn" href="https://www.google.com/maps/dir/?api=1&destination=JINS+Ginza" target="_blank" rel="noopener">🧭 開始導航</a></div></li>
+
+        <li class="stop"><div class="stop-time">全天</div><div class="stop-dot-wrap"><div class="stop-dot"></div></div>
+          <div class="stop-body"><div class="stop-head"><span class="tag tag-移動">移動</span><h4>自由活動</h4></div>
+          <p class="stop-addr">Tokyo</p>
+          <div class="stop-metaline"><span>依當天心情彈性安排</span></div>
+          <a class="map-btn" href="https://www.google.com/maps/dir/?api=1&destination=Shinjuku+Tokyo" target="_blank" rel="noopener">🧭 開始導航</a></div></li>
+      </ul>
+    </div>
+  </section>
+  <!-- DAY 8 -->
+  <section class="day" id="day8" style="--accent:var(--d8)">
+    <div class="day-card">
+      <div class="day-head">
+        <div class="num">DAY 8</div>
+        <div class="date">11/7（六）</div>
+        <h3>成田山表參道・返台</h3>
+        <div class="day-meta">
+          <span>✈️ 航班20:10–23:20</span>
+          <span class="wx-badge" id="wxDay8">🌡 讀取天氣中…</span>
+        </div>
+      </div>
+      <div class="route-chips">
+        <b>退房</b><span class="arrow">›</span><b>成田機場寄放行李</b><span class="arrow">›</span><b>成田山表參道</b><span class="arrow">›</span><b>返台</b>
+      </div>
+      <div class="hour-ruler" data-day="day8"></div>
+      <div class="stat-row">
+        <div>景點 <b>1</b></div><div>移動 <b>3</b></div>
+      </div>
+      <div class="tip"><b>⚠️ 關鍵提醒　</b>航班20:10–23:20，請預留機場報到與安檢時間；退房後行李可先寄放成田機場，輕裝去表參道逛逛。</div>
+      <ul class="timeline">
+        <li class="stop"><div class="stop-time">退房後</div><div class="stop-dot-wrap"><div class="stop-dot"></div></div>
+          <div class="stop-body"><div class="stop-head"><span class="tag tag-住宿">住宿</span><h4>Domo S PATIO新宿 退房</h4></div>
+          <p class="stop-addr">〒169-0073 東京都新宿区百人町1丁目-15-29</p>
+          <div class="stop-metaline"></div>
+          <a class="map-btn" href="https://www.google.com/maps/dir/?api=1&destination=Domo%20S%20PATIO%E6%96%B0%E5%AE%BF%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%96%B0%E5%AE%BF%E5%8C%BA%E7%99%BE%E4%BA%BA%E7%94%BA1%E4%B8%81%E7%9B%AE-15-29" target="_blank" rel="noopener">🧭 開始導航</a></div></li>
+
+        <li class="stop"><div class="stop-time">上午</div><div class="stop-dot-wrap"><div class="stop-dot"></div></div>
+          <div class="stop-body"><div class="stop-head"><span class="tag tag-移動">移動</span><h4>寄放行李成田機場，搭一站到成田站</h4></div>
+          <p class="stop-addr">Narita Airport → Narita Station</p>
+          <div class="stop-metaline"><span>🚄 電車一站即達</span></div>
+          <a class="map-btn" href="https://www.google.com/maps/dir/?api=1&destination=Narita+Station" target="_blank" rel="noopener">🧭 開始導航</a></div></li>
+
+        <li class="stop"><div class="stop-time">白天</div><div class="stop-dot-wrap"><div class="stop-dot"></div></div>
+          <div class="stop-body"><div class="stop-head"><span class="tag tag-景點">景點</span><h4>成田山表參道商店街</h4></div>
+          <p class="stop-addr">成田山表參道, Narita, Chiba</p>
+          <div class="stop-metaline"><span>返程前最後散步、買伴手禮</span></div>
+          <a class="map-btn" href="https://www.google.com/maps/dir/?api=1&destination=Naritasan+Omotesando" target="_blank" rel="noopener">🧭 開始導航</a></div></li>
+
+        <li class="stop"><div class="stop-time">20:10<br><span>23:20</span></div><div class="stop-dot-wrap"><div class="stop-dot"></div></div>
+          <div class="stop-body"><div class="stop-head"><span class="tag tag-移動">移動</span><h4>日本 → 台灣｜航班返台</h4></div>
+          <p class="stop-addr">Narita Airport</p>
+          <div class="stop-metaline"><span>✈️ 請預留機場報到與安檢時間</span></div>
+          <a class="map-btn" href="https://www.google.com/maps/dir/?api=1&destination=Narita+Airport" target="_blank" rel="noopener">🧭 開始導航</a></div></li>
+
+        <li class="stop"><div class="stop-time">23:20後</div><div class="stop-dot-wrap"><div class="stop-dot"></div></div>
+          <div class="stop-body"><div class="stop-head"><span class="tag tag-移動">移動</span><h4>返回溫暖的家</h4></div>
+          <p class="stop-addr">🏠</p>
+          <div class="stop-metaline"><span>旅程結束，辛苦了！</span></div>
+          <a class="map-btn" href="https://www.google.com/maps/dir/?api=1&destination=Taiwan" target="_blank" rel="noopener">🧭 開始導航</a></div></li>
+      </ul>
+    </div>
+  </section>
+</section>
+
+<!-- ============ VIEW 2: 交通 ============ -->
+<section class="view" id="view-transport">
+  <!-- 交通頁頭 -->
+  <div class="page-header">
+    <div class="ph-eyebrow">Transport</div>
+    <h2>🚌 交通總覽</h2>
+    <p>每日移動方式、時間與費用，點「🧭 導航」直接開Google地圖規劃路線。</p>
+  </div>
+
+  <div class="transport-day">
+    <h3>🚗 河口湖兩日包車</h3>
+    <div class="td-date">10/31（六）－11/1（日）</div>
+      <div class="t-seg"><span class="t-icon">🚗</span><div class="t-info"><div class="t-route">成田機場 → HAOSTAY河口湖</div><div class="t-detail">10/31包車費用 ¥41,500・車程約3.5小時</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=HAOSTAY%20%E6%B2%B3%E5%8F%A3%E6%B9%96&travelmode=driving" target="_blank" rel="noopener">🧭 導航</a></div>
+      <div class="t-seg"><span class="t-icon">🚗</span><div class="t-info"><div class="t-route">富士山周邊 → Domo S PATIO新宿</div><div class="t-detail">11/1包車費用 ¥47,500・8小時包車，司機12:00到富士山接送，20:00前送達新宿</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Domo%20S%20PATIO%E6%96%B0%E5%AE%BF%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%96%B0%E5%AE%BF%E5%8C%BA%E7%99%BE%E4%BA%BA%E7%94%BA1%E4%B8%81%E7%9B%AE-15-29&travelmode=driving" target="_blank" rel="noopener">🧭 導航</a></div>
+    <div class="t-detail" style="margin-top:8px;">訂單總額 ¥89,000（訂金15%已付NT$2,860、尾款85% ¥76,000請於11/1行程結束時現金交給司機）</div>
+  </div>
+
+  <div class="transport-day">
+    <h3>DAY 3</h3>
+    <div class="td-date">11/2（一）東京市區</div>
+      <div class="t-seg"><span class="t-icon">🚉</span><div class="t-info"><div class="t-route">大久保 → 明治神宮／原宿</div><div class="t-detail">JR山手線＋步行・約20分・約¥170</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Meiji%20Jingu%20Shrine&travelmode=transit" target="_blank" rel="noopener">🧭 導航</a></div>
+      <div class="t-seg"><span class="t-icon">🚶</span><div class="t-info"><div class="t-route">原宿 → 涉谷</div><div class="t-detail">步行或1站山手線・15–20分・¥0–150</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Shibuya%20Station&travelmode=transit" target="_blank" rel="noopener">🧭 導航</a></div>
+      <div class="t-seg"><span class="t-icon">🚉</span><div class="t-info"><div class="t-route">涉谷 → 秋葉原</div><div class="t-detail">山手線＋中央線快速・約25分・約¥210</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Akihabara%20Station&travelmode=transit" target="_blank" rel="noopener">🧭 導航</a></div>
+      <div class="t-seg"><span class="t-icon">🚉</span><div class="t-info"><div class="t-route">秋葉原 → 上野</div><div class="t-detail">山手線1站・約5分・約¥150</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Ueno%20Station&travelmode=transit" target="_blank" rel="noopener">🧭 導航</a></div>
+      <div class="t-seg"><span class="t-icon">🚉</span><div class="t-info"><div class="t-route">上野 → 大久保</div><div class="t-detail">山手線＋轉乘・約25分・約¥210</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Shin-Okubo%20Station&travelmode=transit" target="_blank" rel="noopener">🧭 導航</a></div>
+  </div>
+
+  <div class="transport-day">
+    <h3>DAY 4</h3>
+    <div class="td-date">11/3（二）橫濱一日遊</div>
+      <div class="t-seg"><span class="t-icon">🚆</span><div class="t-info"><div class="t-route">大久保/新宿 → 橫濱</div><div class="t-detail">JR湘南新宿線直達・約33分・¥580（IC ¥571）</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Yokohama%20Station&travelmode=transit" target="_blank" rel="noopener">🧭 導航</a></div>
+      <div class="t-seg"><span class="t-icon">🚆</span><div class="t-info"><div class="t-route">橫濱 → 大久保/新宿</div><div class="t-detail">同路線・約33分・¥580</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Shin-Okubo%20Station&travelmode=transit" target="_blank" rel="noopener">🧭 導航</a></div>
+      <div class="t-seg"><span class="t-icon">🚶</span><div class="t-info"><div class="t-route">橫濱市區內移動</div><div class="t-detail">步行或港未來線・依站點・¥0–220</div></div></div>
+  </div>
+
+  <div class="transport-day">
+    <h3>DAY 5</h3>
+    <div class="td-date">11/4（三）淺草晴空塔</div>
+      <div class="t-seg"><span class="t-icon">🚇</span><div class="t-info"><div class="t-route">大久保/新宿 → 淺草</div><div class="t-detail">都營大江戶線＋銀座線或JR＋地鐵・約30–40分・¥210–260</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Asakusa%20Station&travelmode=transit" target="_blank" rel="noopener">🧭 導航</a></div>
+      <div class="t-seg"><span class="t-icon">🚶</span><div class="t-info"><div class="t-route">淺草 → 晴空塔</div><div class="t-detail">步行15分，或東武晴空塔線1站・5–15分・¥0–150</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Tokyo%20Skytree&travelmode=walking" target="_blank" rel="noopener">🧭 導航</a></div>
+      <div class="t-seg"><span class="t-icon">🚇</span><div class="t-info"><div class="t-route">晴空塔/淺草 → 大久保</div><div class="t-detail">同去程反向・約30–40分・¥210–260</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Shin-Okubo%20Station&travelmode=transit" target="_blank" rel="noopener">🧭 導航</a></div>
+  </div>
+
+  <div class="transport-day">
+    <h3>DAY 6</h3>
+    <div class="td-date">11/5（四）池袋</div>
+      <div class="t-seg"><span class="t-icon">🚆</span><div class="t-info"><div class="t-route">大久保/新宿 → 池袋</div><div class="t-detail">JR山手線直達・約12分・約¥170</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Ikebukuro%20Station&travelmode=transit" target="_blank" rel="noopener">🧭 導航</a></div>
+      <div class="t-seg"><span class="t-icon">🚆</span><div class="t-info"><div class="t-route">池袋 → 大久保/新宿</div><div class="t-detail">同路線・約12分・約¥170</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Shin-Okubo%20Station&travelmode=transit" target="_blank" rel="noopener">🧭 導航</a></div>
+  </div>
+
+  <div class="transport-day">
+    <h3>DAY 7</h3>
+    <div class="td-date">11/6（五）新宿・銀座</div>
+      <div class="t-seg"><span class="t-icon">🚇</span><div class="t-info"><div class="t-route">新宿 → 銀座</div><div class="t-detail">丸之內線＋轉乘或JR・約20–25分・¥210–260</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Ginza%20Station&travelmode=transit" target="_blank" rel="noopener">🧭 導航</a></div>
+      <div class="t-seg"><span class="t-icon">🚇</span><div class="t-info"><div class="t-route">銀座 → 大久保/新宿</div><div class="t-detail">同路線反向・約20–25分・¥210–260</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Shin-Okubo%20Station&travelmode=transit" target="_blank" rel="noopener">🧭 導航</a></div>
+  </div>
+
+  <div class="transport-day">
+    <h3>DAY 8</h3>
+    <div class="td-date">11/7（六）返台</div>
+      <div class="t-seg"><span class="t-icon">🚄</span><div class="t-info"><div class="t-route">大久保/新宿 → 成田機場</div><div class="t-detail">JR成田特快N'EX單程・約75–90分・¥3,250</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Narita%20Airport&travelmode=transit" target="_blank" rel="noopener">🧭 導航</a></div>
+      <div class="t-seg"><span class="t-icon">🚄</span><div class="t-info"><div class="t-route">（較省錢選項）</div><div class="t-detail">Skyliner＋山手線轉乘・約60分・¥2,840</div></div></div>
+      <div class="t-seg"><span class="t-icon">🚉</span><div class="t-info"><div class="t-route">成田機場 → 成田站</div><div class="t-detail">京成/JR一站・約5–10分・¥200–300</div></div><a class="t-nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=Narita%20Station&travelmode=transit" target="_blank" rel="noopener">🧭 導航</a></div>
+  </div>
+
+</section>
+
+<!-- ============ VIEW 3: 住宿 ============ -->
+<section class="view" id="view-lodging">
+  <div class="page-header">
+    <div class="ph-eyebrow">Lodging</div>
+    <h2>🏨 住宿資訊</h2>
+    <p>兩段住宿的地址、入住日期與費用，點下方按鈕直接開始導航。</p>
+  </div>
+
+  <div class="lodging-card" style="--accent:var(--d1)">
+    <div class="lc-head"><div class="lc-tag">DAY 1–2</div><h3>🍁 HAOSTAY 河口湖</h3></div>
+    <div class="lc-body">
+      <div class="lc-row"><b>入住</b><span>10/31（六）－11/1（日）・共2晚</span></div>
+      <div class="lc-row"><b>地址</b><span>〒401-0301 山梨県南都留郡富士河口湖町船津251-4</span></div>
+      <div class="lc-row"><b>費用</b><span>總額¥6,658（4人均攤約¥1,665/人）</span></div>
+      <a class="lc-nav" href="https://www.google.com/maps/dir/?api=1&destination=HAOSTAY%20%E6%B2%B3%E5%8F%A3%E6%B9%96%20%E5%B1%B1%E6%A2%A8%E7%9C%8C%E5%8D%97%E9%83%BD%E7%95%99%E9%83%A1%E5%AF%8C%E5%A3%AB%E6%B2%B3%E5%8F%A3%E6%B9%96%E7%94%BA%E8%88%B9%E6%B4%A5251-4&travelmode=driving" target="_blank" rel="noopener">🧭 開始導航</a>
+    </div>
+  </div>
+
+  <div class="lodging-card" style="--accent:var(--d6)">
+    <div class="lc-head"><div class="lc-tag">DAY 2–8</div><h3>🍁 Domo S PATIO新宿 201</h3></div>
+    <div class="lc-body">
+      <div class="lc-row"><b>入住</b><span>11/1（日）－11/7（六）・共6晚</span></div>
+      <div class="lc-row"><b>地址</b><span>〒169-0073 東京都新宿区百人町1丁目-15-29</span></div>
+      <div class="lc-row"><b>交通</b><span>從JR新大久保站徒步約3分鐘</span></div>
+      <div class="lc-row"><b>費用</b><span>6晚總額¥37,080（4人均攤約¥9,270/人）</span></div>
+      <a class="lc-nav" href="https://www.google.com/maps/dir/?api=1&destination=Domo%20S%20PATIO%E6%96%B0%E5%AE%BF%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%96%B0%E5%AE%BF%E5%8C%BA%E7%99%BE%E4%BA%BA%E7%94%BA1%E4%B8%81%E7%9B%AE-15-29&travelmode=driving" target="_blank" rel="noopener">🧭 開始導航</a>
+    </div>
+  </div>
+
+  <div class="lodging-note">⚠️ Domo S PATIO新宿為環保優惠專案，<b>不提供大毛巾（浴巾）、小毛巾、一次性牙刷牙膏組</b>，請自行攜帶或在OGINO／當地藥妝店採買。</div>
+</section>
+
+<!-- ============ VIEW 4: 行李 ============ -->
+<section class="view" id="view-packing">
+  <div class="page-header">
+    <div class="ph-eyebrow">Packing</div>
+    <h2>🧳 行李清單</h2>
+    <p>勾選後會記住進度（本機儲存），下次打開不用重新勾。</p>
+  </div>
+  <section class="checklist">
+    <h2>🍁 出發前確認 Checklist</h2>
+
+    <div class="check-sub">🔺 必須自備</div>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">✈️ 護照</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">💴 現金（日幣要換夠）</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">💳 有開通海外消費功能的信用卡</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">🌐 網路漫遊（或網卡／eSIM／租WiFi機）－用網卡記得帶取卡針</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">🚊 日本交通卡（ICOCA／SUICA）</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">🔌 充電線、豆腐頭（充電器）、行動電源</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">💊 個人常備藥</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">👕 衣物、內衣褲、襪子</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">🏷️ AirTag</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">📱 填寫 <a href="https://www.vjw.digital.go.jp/main/#/vjwplo001" target="_blank" rel="noopener">Visit Japan Web</a>（VJW）</span>
+    </label>
+
+    <div class="check-sub">🔺 看你需不需要</div>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">🛡️ 不便險、意外險</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">👛 零錢包（日幣找零很多，方便裝零錢）</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">💄 化妝品、保養品</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">🧴 盥洗用品（卸妝、洗面乳、洗髮精、沐浴乳、護髮、牙刷牙膏、毛巾）－Domo S新宿不提供大小毛巾與一次性牙刷牙膏組，這項務必自己帶</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">🥿 室內拖</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">🧴 護手霜（日本乾燥，也可防靜電）</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">😷 口罩、衛生紙、濕紙巾、衛生棉</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">👁️ 隱形眼鏡、隱形眼鏡盒、保養液</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">🎒 壓縮袋（節省行李箱空間）</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">☂️ 雨具</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">🎫 晴空塔門票（天望甲板約¥1,800–3,600／套票約¥3,000–4,800，方案未定，先兩種都列著）</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">👘 和服體驗預約確認（11/4）</span>
+    </label>
+    <label class="check-item">
+      <input type="checkbox">
+      <span class="check-text">🚗 河口湖包車司機聯絡方式確認，尾款¥76,000現金備妥（11/1交付）</span>
+    </label>
+
+    <div class="check-warn">
+      <b>⚠️ 只能放隨身包包，不可託運</b>
+      行動電源・打火機・乾洗手／酒精棉片／75%藥用酒精（限單瓶不超過100ml，需放夾鍊袋）
+    </div>
+    <div class="check-warn">
+      <b>⚠️ 不能放隨身包包，必須託運</b>
+      大於100ml的液體（乳液、噴霧、膠狀物）・自拍棒／相機腳架・指甲剪／刮鬍刀／修眉刀・長雨傘
+    </div>
+  </section>
+</section>
+
+<!-- ============ VIEW 5: 預算 ============ -->
+<section class="view" id="view-budget">
+  <div class="page-header">
+    <div class="ph-eyebrow">Budget</div>
+    <h2>💰 預算總覽</h2>
+    <p>每日抓概值僅供參考，實際依店家與購買方案為準；下方也有記帳與匯率速算工具。</p>
+  </div>
+
+  <div class="budget-day">
+    <div class="bd-top"><span class="bd-day">Day1 · 10/31</span><span class="bd-amt">¥2,500–3,500/人</span></div>
+    <div class="bd-desc">晚餐＋超市採買</div>
+  </div>
+  <div class="budget-day">
     <div class="bd-top"><span class="bd-day">Day2 · 11/1</span><span class="bd-amt">¥1,700–3,300/人</span></div>
     <div class="bd-desc">午餐＋富士山周邊零星消費</div>
   </div>
@@ -1123,7 +1483,7 @@
     if(!jpy || !rate || !out) return;
     try{
       var saved = localStorage.getItem('fxRate');
-            if(saved && !isNaN(parseFloat(saved))) rate.value = saved;
+      if(saved && !isNaN(parseFloat(saved))) rate.value = saved;
     }catch(e){}
     function calc(){
       var j = parseFloat(jpy.value);
