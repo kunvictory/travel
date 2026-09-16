@@ -165,4 +165,70 @@
   .day-head .num{font-weight:800;font-size:13px;letter-spacing:.06em;color:var(--accent);}
   .day-head .date{font-size:13px;color:var(--ink2);margin-top:5px;}
   .day-head h3{font-size:20px;font-weight:800;margin:8px 0 12px;line-height:1.35;color:#f9f4ef;}
-  .day-meta{display:flex;flex-wrap:w
+  .day-meta{display:flex;flex-wrap:wrap;gap:8px;}
+  .day-meta span{font-size:11.5px;background:rgba(255,255,255,.55);color:var(--ink2);padding:5px 10px;border-radius:999px;}
+  .wx-badge{font-size:11.5px;background:rgba(255,255,255,.7);color:var(--ink2);padding:5px 10px;border-radius:999px;font-weight:600;}
+
+  .route-chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:16px 20px 4px;font-size:12px;color:var(--muted);}
+  .route-chips b{background:var(--tabbg);color:var(--ink);padding:4px 9px;border-radius:8px;font-weight:600;}
+  .route-chips .arrow{color:var(--muted-soft);}
+
+  /* ---------- hour ruler ---------- */
+  .hour-ruler{margin:14px 20px 6px;padding:10px 8px 6px;background:var(--tabbg);border-radius:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .hr-track{display:flex;gap:1px;min-width:460px;}
+  .hr-tick{flex:1;display:flex;flex-direction:column;align-items:center;min-height:26px;}
+  .hr-tick i{display:block;width:1px;height:9px;background:var(--line);border-radius:1px;}
+  .hr-tick b{font-size:10px;color:var(--muted);margin-top:2px;font-weight:600;}
+  .hr-tick.has-activity i{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+
+  .stat-row{display:flex;gap:14px;padding:12px 20px 4px;flex-wrap:wrap;}
+  .stat-row div{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:5px;}
+  .stat-row b{color:var(--ink);font-size:12.5px;}
+
+  .tip{margin:16px 20px 4px;background:var(--tabbg);border-left:3px solid var(--accent);
+    border-radius:0 10px 10px 0;padding:11px 13px;font-size:13.5px;color:var(--ink2);line-height:1.5;}
+  .tip b{color:var(--accent);font-weight:700;}
+  .tip-empty{margin:16px 20px 20px;text-align:center;padding:30px 16px;color:var(--muted);font-size:13px;background:var(--tabbg);border-radius:12px;line-height:1.8;}
+
+  /* ---------- timeline ---------- */
+  .timeline{list-style:none;margin:18px 8px 4px;padding:0 12px 16px;position:relative;}
+  .timeline:before{content:'';position:absolute;left:66px;top:6px;bottom:16px;width:2px;background:var(--line);}
+  .stop{position:relative;padding:0 0 22px 0;display:flex;gap:12px;}
+  .stop:last-child{padding-bottom:4px;}
+  .stop-time{
+    flex:0 0 38px;font-size:13px;color:#f9bc60;
+    text-align:right;padding-top:2px;line-height:2;
+  }
+  .stop-dot-wrap{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;padding-top:4px;position:relative;z-index:1;}
+  .stop-dot{width:11px;height:11px;border-radius:50%;background:var(--accent);border:2px solid var(--card);box-shadow:0 0 0 2px var(--accent);}
+  .stop-body{flex:1;min-width:0;padding-bottom:2px;}
+  .stop-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
+  .tag{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;color:#fff;white-space:nowrap;}
+  .tag-住宿{background:var(--gold);}
+  .tag-用餐{background:var(--red);}
+  .tag-移動{background:#8c8477;}
+  .tag-景點{background:var(--spot);}
+  .tag-購物{background:var(--green);}
+  .stop-body h4{margin:0;font-size:15px;line-height:1.8;color:#55423d;font-weight:700;}
+  .stop-addr{margin:2px 0 6px;font-size:13.5px;color:#8c7851;}
+  .stop-metaline{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;}
+  .stop-metaline span{font-size:13.5px;color:var(--muted);display:inline-flex;align-items:center;gap:4px;}
+  .map-btn{
+    display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;
+    color:var(--accent);text-decoration:none;border:1.4px solid var(--accent);
+    padding:5px 11px;border-radius:999px;transition:background .15s ease,color .15s ease;
+  }
+  .map-btn:hover, .map-btn:focus-visible{background:var(--accent);color:#fff;}
+
+  /* ---------- next-stop nav & copy buttons ---------- */
+  .nav-btn,.copy-btn{
+    display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;
+    text-decoration:none;padding:5px 11px;border-radius:999px;cursor:pointer;
+    transition:background .15s ease,color .15s ease;margin-left:6px;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .nav-btn{color:var(--green);border:1.4px solid var(--green);}
+  .nav-btn:hover,.nav-btn:focus-visible{background:var(--green);color:#fff;}
+  .copy-btn{color:var(--gold);border:1.4px solid var(--gold);background:none;font-family:inherit;}
+  .copy-btn:hover,.copy-btn:focus-visible{background:var(--gold);color:#fff;}
+  .copy-btn.copied{background:var(--gold);color:#fff;}
