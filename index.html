@@ -1826,7 +1826,6 @@
   })();
 
 // 1. 先載入並初始化 Firebase 連線（必須放前面！）
-<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -1850,6 +1849,8 @@
   };
 
   // 發送事件通知記帳系統初始化完成
+  window.dispatchEvent(new CustomEvent('firebase-ready'));
+</script>
   window.dispatchEvent(new CustomEvent('firebase-ready'));
 </script>
 
