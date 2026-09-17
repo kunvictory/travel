@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
   :root{
     --bg:#fbf1e6;
@@ -152,8 +154,19 @@
   .check-item .check-text{font-size:14px;line-height:1.55;color:var(--ink);}
   .check-item input[type="checkbox"]:checked ~ .check-text{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--gold);}
   .check-item .check-text a{color:var(--red);font-weight:600;text-decoration:underline;text-underline-offset:2px;}
-  .check-sub{font-size:13px;font-weight:800;color:var(--red);margin:16px 0 2px;letter-spacing:.02em;display:flex;align-items:center;gap:5px;}
-  .check-sub:first-child{margin-top:0;}
+   .check-group{border-top:1px dashed var(--line);}
+  .check-group:first-of-type{border-top:none;}
+  .check-sub{
+    width:100%;appearance:none;border:none;background:none;cursor:pointer;font-family:inherit;
+    display:flex;align-items:center;gap:8px;padding:14px 0 8px;text-align:left;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .check-sub .cs-arrow{font-size:11px;color:var(--red);transition:transform .2s ease;flex:0 0 auto;}
+  .check-sub.collapsed .cs-arrow{transform:rotate(-90deg);}
+  .check-sub .cs-label{flex:1;font-size:13px;font-weight:800;color:var(--red);letter-spacing:.02em;}
+  .check-sub .cs-count{font-size:11.5px;font-weight:700;color:var(--muted);background:var(--tabbg);padding:2px 9px;border-radius:999px;flex:0 0 auto;white-space:nowrap;}
+  .check-sub .cs-count.done{color:#fff;background:var(--green);}
+  .check-items.collapsed{display:none;}
   .check-warn{margin:14px 0 4px;background:#fdf0e4;border-left:3px solid var(--red);border-radius:0 10px 10px 0;padding:11px 13px;font-size:13px;color:var(--ink2);line-height:1.75;}
   .check-warn b{display:block;color:var(--red);font-weight:800;margin-bottom:4px;}
 
@@ -1151,8 +1164,8 @@
           <div class="fc-term">第二航廈</div>
         </div>
       </div>
-      <div class="fc-nav-row">
-        <a class="lc-nav" style="margin-top:0;" href="https://www.google.com/maps/dir/?api=1&destination=Narita+Airport+Terminal+2&travelmode=transit" target="_blank" rel="noopener">🧭 成田第二航廈</a>
+            <div class="fc-nav-row">
+        <a class="lc-nav" style="margin-top:0;" href="https://www.google.com/maps/dir/?api=1&destination=Taoyuan+International+Airport+Terminal+1" target="_blank" rel="noopener">🧭 桃園第一航廈</a>
       </div>
     </div>
 
@@ -1197,7 +1210,13 @@
   <section class="checklist">
     <h2>🍁 出發前確認 Checklist</h2>
 
-    <div class="check-sub">🔺 必須自備</div>
+        <div class="check-group">
+    <button type="button" class="check-sub" data-group="must">
+      <span class="cs-arrow">▾</span>
+      <span class="cs-label">🔺 必須自備</span>
+      <span class="cs-count" data-count="must">0/0</span>
+    </button>
+    <div class="check-items" data-items="must">
     <label class="check-item">
       <input type="checkbox">
       <span class="check-text">✈️ 護照</span>
@@ -1238,8 +1257,16 @@
       <input type="checkbox">
       <span class="check-text">📱 填寫 <a href="https://www.vjw.digital.go.jp/main/#/vjwplo001" target="_blank" rel="noopener">Visit Japan Web</a>（VJW）</span>
     </label>
+    </div>
+    </div>
 
-    <div class="check-sub">🔺 看你需不需要</div>
+    <div class="check-group">
+    <button type="button" class="check-sub" data-group="optional">
+      <span class="cs-arrow">▾</span>
+      <span class="cs-label">🔺 看你需不需要</span>
+      <span class="cs-count" data-count="optional">0/0</span>
+    </button>
+    <div class="check-items" data-items="optional">
     <label class="check-item">
       <input type="checkbox">
       <span class="check-text">🛡️ 不便險、意外險</span>
@@ -1292,6 +1319,8 @@
       <input type="checkbox">
       <span class="check-text">🚗 河口湖包車司機聯絡方式確認，尾款¥76,000現金備妥（11/1交付）</span>
     </label>
+    </div>
+    </div>
 
     <div class="check-warn">
       <b>⚠️ 只能放隨身包包，不可託運</b>
@@ -1654,7 +1683,7 @@
     });
   })();
 
-  // ---------- Checklist 勾選記憶 ----------
+    // ---------- Checklist 勾選記憶 ----------
   (function(){
     var boxes = document.querySelectorAll('.check-item input[type="checkbox"]');
     if(!boxes.length) return;
@@ -1662,6 +1691,20 @@
       var saved = JSON.parse(localStorage.getItem('checklistState') || '[]');
       boxes.forEach(function(box, i){ if(saved[i]) box.checked = true; });
     }catch(e){}
+
+    var groupKeys = ['must', 'optional'];
+    function updateGroupCount(key){
+      var container = document.querySelector('.check-items[data-items="' + key + '"]');
+      var countEl = document.querySelector('.cs-count[data-count="' + key + '"]');
+      if(!container || !countEl) return;
+      var groupBoxes = container.querySelectorAll('input[type="checkbox"]');
+      var checked = 0;
+      groupBoxes.forEach(function(b){ if(b.checked) checked++; });
+      countEl.textContent = checked + '/' + groupBoxes.length;
+      countEl.classList.toggle('done', groupBoxes.length > 0 && checked === groupBoxes.length);
+    }
+    groupKeys.forEach(updateGroupCount);
+
     boxes.forEach(function(box){
       box.addEventListener('change', function(){
         try{
@@ -1669,6 +1712,26 @@
           boxes.forEach(function(b){ state.push(b.checked); });
           localStorage.setItem('checklistState', JSON.stringify(state));
         }catch(e){}
+        groupKeys.forEach(updateGroupCount);
+      });
+    });
+
+    document.querySelectorAll('.check-sub').forEach(function(btn){
+      var key = btn.dataset.group;
+      if(!key) return;
+      try{
+        if(localStorage.getItem('checklistCollapse_' + key) === '1'){
+          btn.classList.add('collapsed');
+          var itemsInit = document.querySelector('.check-items[data-items="' + key + '"]');
+          if(itemsInit) itemsInit.classList.add('collapsed');
+        }
+      }catch(e){}
+      btn.addEventListener('click', function(){
+        var items = document.querySelector('.check-items[data-items="' + key + '"]');
+        if(!items) return;
+        var collapsed = items.classList.toggle('collapsed');
+        btn.classList.toggle('collapsed', collapsed);
+        try{ localStorage.setItem('checklistCollapse_' + key, collapsed ? '1' : '0'); }catch(e){}
       });
     });
   })();
@@ -2077,6 +2140,15 @@
       try{ localStorage.setItem(ON_KEY, enabled ? '1' : '0'); }catch(e){}
     });
   })();
+</script>
+<script>
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(err){
+        console.log('Service Worker 註冊失敗：', err);
+      });
+    });
+  }
 </script>
 </body>
 </html>
