@@ -1819,51 +1819,22 @@
   loadWeather('wxDay7', 35.6938, 139.7036, '2026-11-06');
   loadWeather('wxDay8', 35.7720, 140.3929, '2026-11-07');
 
-// ---------- 快速統計：已排景點數 ----------
+  // ---------- 快速統計：已排景點數 ----------
   (function(){
     var qsSpots = document.getElementById('qsSpots');
     if(qsSpots){ qsSpots.textContent = document.querySelectorAll('.tag-景點').length; }
   })();
-</script>
 
-<!-- 1. 先載入並初始化 Firebase 連線（必須放前面！） -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyA9C9kDJsVhHD6lsyJZEUKu301kOLX0uZE",
-    authDomain: "trip-tokyo-ab92c.firebaseapp.com",
-    projectId: "trip-tokyo-ab92c",
-    storageBucket: "trip-tokyo-ab92c.firebasestorage.app",
-    messagingSenderId: "506192938318",
-    appId: "1:506192938318:web:477b0807a7f94124098a1f",
-    measurementId: "G-DZBVPRGJR3"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  // 把 db 與常用模組掛載到全域，供記帳腳本使用
-  window.db = db;
-  window.firebaseFirestoreModules = {
-    collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy
-  };
-
-  // 發送事件通知記帳系統初始化完成
-  window.dispatchEvent(new CustomEvent('firebase-ready'));
-</script>
-
-<!-- 2. 接著才放 Firebase 雲端即時同步版記帳邏輯 -->
-<script>
-  // ---------- 記帳（Firebase 雲端即時同步版） ----------
+  // ---------- 記帳（小儀／阿琨／靜靜／東祐／共同） ----------
   (function(){
-    const PEOPLE = ['小儀','阿琨','靜靜','東祐'];
-    let entries = [];
-    const catColors = {'餐飲':'#b5573f','交通':'#7e9aa8','購物':'#8fa998','門票':'#c9a876','其他':'#a8998b'};
+    var STORAGE_KEY = 'expenseEntries';
+    var PEOPLE = ['小儀','阿琨','靜靜','東祐'];
+    var entries = [];
+    try{ entries = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }catch(e){ entries = []; }
+    var catColors = {'餐飲':'#b5573f','交通':'#7e9aa8','購物':'#8fa998','門票':'#c9a876','其他':'#a8998b'};
 
-    function getDb(){
-      return window.db;
+    function save(){
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }catch(e){}
     }
 
     function render(){
@@ -1880,26 +1851,21 @@
       PEOPLE.forEach(function(p){ sums[p] = 0; });
       sums['共同'] = 0;
       var catSums = {};
-      
-      entries.forEach(function(en){
+      entries.forEach(function(en, i){
         sums[en.person] = (sums[en.person] || 0) + en.amount;
         catSums[en.category] = (catSums[en.category] || 0) + en.amount;
         var li = document.createElement('li');
         li.className = 'exp-item';
-        
         var tagSpan = document.createElement('span');
         tagSpan.className = 'exp-tag';
         tagSpan.style.background = catColors[en.category] || '#999';
         tagSpan.textContent = en.category;
-        
         var personSpan = document.createElement('span');
         personSpan.className = 'exp-person';
         personSpan.textContent = (en.person === '共同' && en.paidBy) ? ('共同(' + en.paidBy + '付)') : en.person;
-        
         var noteSpan = document.createElement('span');
         noteSpan.className = 'exp-note';
         noteSpan.textContent = en.note || '';
-        
         var amtWrap = document.createElement('span');
         amtWrap.className = 'exp-amt-wrap';
         var amtSpan = document.createElement('span');
@@ -1910,20 +1876,15 @@
         twdSpan.textContent = '≈NT$' + Math.round(en.amount * getFxRate()).toLocaleString();
         amtWrap.appendChild(amtSpan);
         amtWrap.appendChild(twdSpan);
-        
         var delBtn = document.createElement('button');
         delBtn.type = 'button';
         delBtn.className = 'exp-del';
         delBtn.textContent = '✕';
-        delBtn.addEventListener('click', async function(){
-          try {
-            const { deleteDoc, doc } = window.firebaseFirestoreModules;
-            await deleteDoc(doc(getDb(), "expenses", en.id));
-          } catch(e) {
-            console.error("刪除失敗: ", e);
-          }
+        delBtn.addEventListener('click', function(){
+          entries.splice(i, 1);
+          save();
+          render();
         });
-        
         li.appendChild(tagSpan);
         li.appendChild(personSpan);
         li.appendChild(noteSpan);
@@ -1931,7 +1892,6 @@
         li.appendChild(delBtn);
         list.appendChild(li);
       });
-
       var rate = getFxRate();
       var total = 0;
       PEOPLE.forEach(function(p, idx){
@@ -1950,7 +1910,6 @@
       document.getElementById('sumTotalTwd').textContent = '≈NT$' + Math.round(total * rate).toLocaleString();
       var qsBudget = document.getElementById('qsBudget');
       if(qsBudget){ qsBudget.textContent = '¥' + total.toLocaleString(); }
-      
       var bar = document.getElementById('expBar');
       bar.innerHTML = '';
       if(total > 0){
@@ -1966,6 +1925,7 @@
       renderSettlement();
     }
 
+    // 計算「共同」項目的分帳結算：balances 正值=應收，負值=應付；transfers 為建議轉帳清單
     function computeSettlement(){
       var balances = {};
       PEOPLE.forEach(function(p){ balances[p] = 0; });
@@ -2027,6 +1987,7 @@
       }
     }
 
+    // 只有選「共同」時，「先付款人」欄位才有意義，所以只在那時候顯示
     var personSel = document.getElementById('expPerson');
     var paidByWrap = document.getElementById('expPaidByWrap');
     function syncPaidByVisibility(){
@@ -2040,7 +2001,7 @@
 
     var addBtn = document.getElementById('expAdd');
     if(addBtn){
-      addBtn.addEventListener('click', async function(){
+      addBtn.addEventListener('click', function(){
         var person = document.getElementById('expPerson').value;
         var isShared = person === '共同';
         var paidBy = isShared ? document.getElementById('expPaidBy').value : undefined;
@@ -2048,26 +2009,15 @@
         var amount = parseFloat(document.getElementById('expAmount').value);
         var note = document.getElementById('expNote').value.trim();
         if(isNaN(amount) || amount <= 0) return;
-
-        try {
-          const { collection, addDoc } = window.firebaseFirestoreModules;
-          await addDoc(collection(getDb(), "expenses"), {
-            person: person,
-            category: category,
-            amount: amount,
-            note: note,
-            paidBy: paidBy || null,
-            createdAt: Date.now()
-          });
-          document.getElementById('expAmount').value = '';
-          document.getElementById('expNote').value = '';
-        } catch(e) {
-          console.error("新增記帳失敗: ", e);
-          alert("新增失敗，請檢查網路連線");
-        }
+        entries.push({person:person, category:category, amount:amount, note:note, paidBy:paidBy});
+        save();
+        document.getElementById('expAmount').value = '';
+        document.getElementById('expNote').value = '';
+        render();
       });
     }
 
+    // ---------- 記帳明細匯出（複製／下載），方便備份到LINE群組 ----------
     function buildExportText(){
       var rate = getFxRate();
       var lines = ['🍁 河口湖東京橫濱 記帳明細 🍁', ''];
@@ -2089,7 +2039,7 @@
       lines.push('', '— 分帳結算建議 —');
       var result = computeSettlement();
       if(!result.transfers.length){
-        lines.push('print 暫無結算項目');
+        lines.push('目前沒有需要結算的共同項目');
       }else{
         result.transfers.forEach(function(t){
           lines.push(t.from + ' → ' + t.to + '：¥' + t.amt.toLocaleString());
@@ -2115,21 +2065,24 @@
       });
     }
 
-    // 監聽並啟動 Firestore 即時同步
-    window.addEventListener('firebase-ready', () => {
-      const { collection, onSnapshot, query, orderBy } = window.firebaseFirestoreModules;
-      const db = getDb();
-      const q = query(collection(db, "expenses"), orderBy("createdAt", "asc"));
-      onSnapshot(q, (snapshot) => {
-        entries = [];
-        snapshot.forEach((doc) => {
-          entries.push({ id: doc.id, ...doc.data() });
-        });
-        render();
+    var downloadBtn = document.getElementById('expDownloadBtn');
+    if(downloadBtn){
+      downloadBtn.addEventListener('click', function(e){
+        try{
+          var text = buildExportText();
+          var blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+          var url = URL.createObjectURL(blob);
+          downloadBtn.href = url;
+          downloadBtn.download = '記帳明細.txt';
+          setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+        }catch(err){
+          e.preventDefault();
+        }
       });
-    });
+    }
 
     window.renderExpenses = render;
+    render();
   })();
 
   // ---------- 動態飄落楓葉 ----------
@@ -2187,8 +2140,8 @@
       try{ localStorage.setItem(ON_KEY, enabled ? '1' : '0'); }catch(e){}
     });
   })();
-
-  // ---------- Service Worker ----------
+</script>
+<script>
   if('serviceWorker' in navigator){
     window.addEventListener('load', function(){
       navigator.serviceWorker.register('sw.js').catch(function(err){
