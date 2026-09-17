@@ -313,6 +313,28 @@
   .exp-del:hover{color:var(--red);}
   .exp-empty{text-align:center;color:var(--muted);font-size:12.5px;padding:14px 0;}
 
+  /* ---------- 分帳結算 ---------- */
+  .settle-card{margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);}
+  .settle-card h3{font-size:14px;font-weight:800;color:var(--ink);margin:0 0 10px;}
+  .settle-balances{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+  .settle-bal-item{flex:1;min-width:70px;background:var(--tabbg);border-radius:10px;padding:8px 6px;text-align:center;}
+  .settle-bal-item span{display:block;font-size:10.5px;color:var(--muted);}
+  .settle-bal-item b{display:block;font-size:13px;font-weight:800;margin-top:2px;color:var(--ink);}
+  .settle-bal-item.owe b{color:var(--red);}
+  .settle-bal-item.get b{color:var(--green);}
+  .settle-transfers{display:flex;flex-direction:column;gap:6px;margin-bottom:6px;}
+  .settle-transfer-item{font-size:12.5px;background:var(--tabbg);border-radius:8px;padding:8px 10px;color:var(--ink2);}
+  .settle-transfer-item b{color:var(--red);}
+  .settle-empty{font-size:12.5px;color:var(--muted);text-align:center;padding:8px 0;}
+
+  /* ---------- 記帳匯出 ---------- */
+  .exp-export{display:flex;gap:8px;margin:14px 0 4px;flex-wrap:wrap;}
+  .exp-export-btn{flex:1;min-width:120px;text-align:center;appearance:none;border:1.4px solid var(--gold);
+    background:none;color:var(--gold);font-family:inherit;font-size:12.5px;font-weight:700;
+    padding:9px 10px;border-radius:10px;cursor:pointer;text-decoration:none;display:inline-block;}
+  .exp-export-btn:active{background:var(--gold);color:#fff;}
+  .exp-export-btn.copied{background:var(--gold);color:#fff;}
+
   /* ---------- 動態飄落楓葉 ---------- */
   .maple-leaves{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:55;}
   .maple-leaf{position:absolute;top:-8%;will-change:transform,opacity;animation-timing-function:linear;animation-iteration-count:infinite;user-select:none;line-height:1;filter:drop-shadow(0 2px 2px rgba(58,38,32,.12));}
@@ -486,7 +508,7 @@
   <!-- Hero -->
   <section class="hero">
     <div class="hero-eyebrow">🍁 KAWAGUCHIKO・TOKYO・YOKOHAMA ■ 2026.10.31(六) → 11.07(六)</div>
-    <h1>🍁 楓葉富士山・東京 8天7夜</h1>
+    <h1>🍁 楓葉富士山・楓葉東京 8天7夜</h1>
     <p class="sub">前兩天在河口湖賞楓、遠眺富士山；接著轉戰東京市區與橫濱，滿街紅葉銀杏中散步逛街，最後一天輕鬆逛表參道再回家 🍂✈️</p>
 
     <div class="quick-stats">
@@ -1247,6 +1269,12 @@
         <option value="東祐">東祐</option>
         <option value="共同">共同</option>
       </select>
+      <select id="expPaidBy" title="共同項目由誰先付">
+        <option value="小儀">小儀先付</option>
+        <option value="阿琨">阿琨先付</option>
+        <option value="靜靜">靜靜先付</option>
+        <option value="東祐">東祐先付</option>
+      </select>
       <select id="expCategory">
         <option>餐飲</option>
         <option>交通</option>
@@ -1268,7 +1296,20 @@
     </div>
     <div class="exp-bar" id="expBar"></div>
     <ul class="exp-list" id="expList"></ul>
-    <div class="fx-note">台幣換算採用上方「匯率速算」的匯率（可自行調整），僅供參考。記帳資料儲存在本機瀏覽器，離線開啟或下載後可正常保存；沙盒預覽模式可能無法保存，重新整理會清空。</div>
+
+    <div class="settle-card">
+      <h3>🧮 分帳結算</h3>
+      <div class="settle-balances" id="settleBalances"></div>
+      <div class="settle-transfers" id="settleTransfers"></div>
+      <div class="fx-note">結算只計算標記「共同」的項目，依4人平均分攤，並依「先付款人」計算誰該收/該付；個人項目視為各自消費，不計入結算。</div>
+    </div>
+
+    <div class="exp-export">
+      <button type="button" class="exp-export-btn" id="expCopyBtn">📋 複製記帳明細</button>
+      <a href="#" class="exp-export-btn" id="expDownloadBtn">⬇️ 下載記帳明細(.txt)</a>
+    </div>
+
+    <div class="fx-note">台幣換算採用上方「匯率速算」的匯率（可自行調整），僅供參考。記帳資料儲存在本機瀏覽器，離線開啟或下載後可正常保存；沙盒預覽模式可能無法保存，重新整理會清空。建議定期用上方「複製」或「下載」功能備份，避免資料遺失。</div>
   </section>
 </section>
 
@@ -1647,7 +1688,7 @@
         tagSpan.textContent = en.category;
         var personSpan = document.createElement('span');
         personSpan.className = 'exp-person';
-        personSpan.textContent = en.person;
+        personSpan.textContent = (en.person === '共同' && en.paidBy) ? ('共同(' + en.paidBy + '付)') : en.person;
         var noteSpan = document.createElement('span');
         noteSpan.className = 'exp-note';
         noteSpan.textContent = en.note || '';
@@ -1707,23 +1748,152 @@
           bar.appendChild(seg);
         });
       }
+      renderSettlement();
+    }
+
+    // 計算「共同」項目的分帳結算：balances 正值=應收，負值=應付；transfers 為建議轉帳清單
+    function computeSettlement(){
+      var balances = {};
+      PEOPLE.forEach(function(p){ balances[p] = 0; });
+      entries.forEach(function(en){
+        if(en.person !== '共同') return;
+        var payer = en.paidBy;
+        if(!payer || PEOPLE.indexOf(payer) === -1) return;
+        var share = en.amount / PEOPLE.length;
+        PEOPLE.forEach(function(p){ balances[p] -= share; });
+        balances[payer] += en.amount;
+      });
+      PEOPLE.forEach(function(p){ balances[p] = Math.round(balances[p]); });
+
+      var creditors = [], debtors = [];
+      PEOPLE.forEach(function(p){
+        if(balances[p] > 0) creditors.push({p:p, amt:balances[p]});
+        else if(balances[p] < 0) debtors.push({p:p, amt:-balances[p]});
+      });
+      var transfers = [];
+      var ci = 0, di = 0;
+      while(ci < creditors.length && di < debtors.length){
+        var amt = Math.min(creditors[ci].amt, debtors[di].amt);
+        if(amt > 0){ transfers.push({from:debtors[di].p, to:creditors[ci].p, amt:amt}); }
+        creditors[ci].amt -= amt;
+        debtors[di].amt -= amt;
+        if(creditors[ci].amt <= 0) ci++;
+        if(debtors[di].amt <= 0) di++;
+      }
+      return {balances:balances, transfers:transfers};
+    }
+
+    function renderSettlement(){
+      var balDiv = document.getElementById('settleBalances');
+      var tDiv = document.getElementById('settleTransfers');
+      if(!balDiv || !tDiv) return;
+      var result = computeSettlement();
+      balDiv.innerHTML = '';
+      PEOPLE.forEach(function(p){
+        var v = result.balances[p];
+        var item = document.createElement('div');
+        item.className = 'settle-bal-item' + (v > 0 ? ' get' : (v < 0 ? ' owe' : ''));
+        var label = v > 0 ? ('應收 ¥' + v.toLocaleString()) : (v < 0 ? ('應付 ¥' + Math.abs(v).toLocaleString()) : '¥0');
+        item.innerHTML = '<span>' + p + '</span><b>' + label + '</b>';
+        balDiv.appendChild(item);
+      });
+      tDiv.innerHTML = '';
+      if(!result.transfers.length){
+        var empty = document.createElement('div');
+        empty.className = 'settle-empty';
+        empty.textContent = '目前沒有需要結算的共同項目';
+        tDiv.appendChild(empty);
+      }else{
+        result.transfers.forEach(function(t){
+          var row = document.createElement('div');
+          row.className = 'settle-transfer-item';
+          row.innerHTML = t.from + ' → ' + t.to + ' 應付 <b>¥' + t.amt.toLocaleString() + '</b>';
+          tDiv.appendChild(row);
+        });
+      }
     }
 
     var addBtn = document.getElementById('expAdd');
     if(addBtn){
       addBtn.addEventListener('click', function(){
         var person = document.getElementById('expPerson').value;
+        var paidBy = document.getElementById('expPaidBy').value;
         var category = document.getElementById('expCategory').value;
         var amount = parseFloat(document.getElementById('expAmount').value);
         var note = document.getElementById('expNote').value.trim();
         if(isNaN(amount) || amount <= 0) return;
-        entries.push({person:person, category:category, amount:amount, note:note});
+        entries.push({person:person, category:category, amount:amount, note:note, paidBy:paidBy});
         save();
         document.getElementById('expAmount').value = '';
         document.getElementById('expNote').value = '';
         render();
       });
     }
+
+    // ---------- 記帳明細匯出（複製／下載），方便備份到LINE群組 ----------
+    function buildExportText(){
+      var rate = getFxRate();
+      var lines = ['🍁 河口湖東京橫濱 記帳明細 🍁', ''];
+      if(!entries.length){
+        lines.push('（目前尚無記帳項目）');
+      }
+      entries.forEach(function(en){
+        var tag = (en.person === '共同' && en.paidBy) ? ('共同(' + en.paidBy + '付)') : en.person;
+        lines.push(tag + '｜' + en.category + '｜¥' + en.amount.toLocaleString() + (en.note ? ('｜' + en.note) : ''));
+      });
+      lines.push('', '— 小計 —');
+      var sums = {}; PEOPLE.forEach(function(p){ sums[p] = 0; }); sums['共同'] = 0;
+      entries.forEach(function(en){ sums[en.person] = (sums[en.person] || 0) + en.amount; });
+      var total = 0;
+      PEOPLE.forEach(function(p){ total += sums[p] || 0; lines.push(p + '：¥' + (sums[p] || 0).toLocaleString()); });
+      total += sums['共同'] || 0;
+      lines.push('共同：¥' + (sums['共同'] || 0).toLocaleString());
+      lines.push('總計：¥' + total.toLocaleString() + '（≈NT$' + Math.round(total * rate).toLocaleString() + '）');
+      lines.push('', '— 分帳結算建議 —');
+      var result = computeSettlement();
+      if(!result.transfers.length){
+        lines.push('目前沒有需要結算的共同項目');
+      }else{
+        result.transfers.forEach(function(t){
+          lines.push(t.from + ' → ' + t.to + '：¥' + t.amt.toLocaleString());
+        });
+      }
+      return lines.join('\n');
+    }
+
+    var copyBtn = document.getElementById('expCopyBtn');
+    if(copyBtn){
+      copyBtn.addEventListener('click', function(){
+        var text = buildExportText();
+        function done(){
+          copyBtn.textContent = '✓ 已複製，可貼到LINE';
+          copyBtn.classList.add('copied');
+          setTimeout(function(){ copyBtn.textContent = '📋 複製記帳明細'; copyBtn.classList.remove('copied'); }, 2000);
+        }
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
+        }else{
+          fallbackCopy(text, done);
+        }
+      });
+    }
+
+    var downloadBtn = document.getElementById('expDownloadBtn');
+    if(downloadBtn){
+      downloadBtn.addEventListener('click', function(e){
+        try{
+          var text = buildExportText();
+          var blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+          var url = URL.createObjectURL(blob);
+          downloadBtn.href = url;
+          downloadBtn.download = '記帳明細.txt';
+          setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+        }catch(err){
+          e.preventDefault();
+        }
+      });
+    }
+
     window.renderExpenses = render;
     render();
   })();
