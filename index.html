@@ -1825,266 +1825,299 @@
     if(qsSpots){ qsSpots.textContent = document.querySelectorAll('.tag-景點').length; }
   })();
 
-  // ---------- 記帳（小儀／阿琨／靜靜／東祐／共同） ----------
-  (function(){
-    var STORAGE_KEY = 'expenseEntries';
-    var PEOPLE = ['小儀','阿琨','靜靜','東祐'];
-    var entries = [];
-    try{ entries = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }catch(e){ entries = []; }
-    var catColors = {'餐飲':'#b5573f','交通':'#7e9aa8','購物':'#8fa998','門票':'#c9a876','其他':'#a8998b'};
+  // ---------- 記帳（Firebase 雲端即時同步版） ----------
+(function(){
+  // 1. 引入 Firebase 核心與 Firestore 模組（假設你已經在 HTML 引入了 Firebase 初始化）
+  // 請確認你的 window.db 已經在前面初始化完成（後面會提供初始化範例）
+  const PEOPLE = ['小儀','阿琨','靜靜','東祐'];
+  let entries = [];
+  const catColors = {'餐飲':'#b5573f','交通':'#7e9aa8','購物':'#8fa998','門票':'#c9a876','其他':'#a8998b'};
 
-    function save(){
-      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }catch(e){}
+  // 取得全域的 db 物件
+  function getDb(){
+    return window.db;
+  }
+
+  // 從 Firebase 即時監聽資料變動
+  function initFirestoreListener(){
+    const db = getDb();
+    if(!db) {
+      // 如果 db 還沒準備好，稍後再試一次
+      setTimeout(initFirestoreListener, 200);
+      return;
     }
+    
+    // 引入 firebase 函式庫的方法（如果是用 CDN 模組，請確保從全域或模組引入）
+    // 這裡我們直接使用掛載在 window 上的 firestore 方法，或者你可以統一在外面宣告
+  }
 
-    function render(){
-      var list = document.getElementById('expList');
-      if(!list) return;
-      list.innerHTML = '';
-      if(!entries.length){
-        var empty = document.createElement('div');
-        empty.className = 'exp-empty';
-        empty.textContent = '目前還沒有記帳項目';
-        list.appendChild(empty);
-      }
-      var sums = {};
-      PEOPLE.forEach(function(p){ sums[p] = 0; });
-      sums['共同'] = 0;
-      var catSums = {};
-      entries.forEach(function(en, i){
-        sums[en.person] = (sums[en.person] || 0) + en.amount;
-        catSums[en.category] = (catSums[en.category] || 0) + en.amount;
-        var li = document.createElement('li');
-        li.className = 'exp-item';
-        var tagSpan = document.createElement('span');
-        tagSpan.className = 'exp-tag';
-        tagSpan.style.background = catColors[en.category] || '#999';
-        tagSpan.textContent = en.category;
-        var personSpan = document.createElement('span');
-        personSpan.className = 'exp-person';
-        personSpan.textContent = (en.person === '共同' && en.paidBy) ? ('共同(' + en.paidBy + '付)') : en.person;
-        var noteSpan = document.createElement('span');
-        noteSpan.className = 'exp-note';
-        noteSpan.textContent = en.note || '';
-        var amtWrap = document.createElement('span');
-        amtWrap.className = 'exp-amt-wrap';
-        var amtSpan = document.createElement('span');
-        amtSpan.className = 'exp-amt';
-        amtSpan.textContent = '¥' + en.amount.toLocaleString();
-        var twdSpan = document.createElement('span');
-        twdSpan.className = 'exp-twd';
-        twdSpan.textContent = '≈NT$' + Math.round(en.amount * getFxRate()).toLocaleString();
-        amtWrap.appendChild(amtSpan);
-        amtWrap.appendChild(twdSpan);
-        var delBtn = document.createElement('button');
-        delBtn.type = 'button';
-        delBtn.className = 'exp-del';
-        delBtn.textContent = '✕';
-        delBtn.addEventListener('click', function(){
-          entries.splice(i, 1);
-          save();
-          render();
+  function render(){
+    var list = document.getElementById('expList');
+    if(!list) return;
+    list.innerHTML = '';
+    if(!entries.length){
+      var empty = document.createElement('div');
+      empty.className = 'exp-empty';
+      empty.textContent = '目前還沒有記帳項目';
+      list.appendChild(empty);
+    }
+    var sums = {};
+    PEOPLE.forEach(function(p){ sums[p] = 0; });
+    sums['共同'] = 0;
+    var catSums = {};
+    
+    entries.forEach(function(en){
+      sums[en.person] = (sums[en.person] || 0) + en.amount;
+      catSums[en.category] = (catSums[en.category] || 0) + en.amount;
+      var li = document.createElement('li');
+      li.className = 'exp-item';
+      
+      var tagSpan = document.createElement('span');
+      tagSpan.className = 'exp-tag';
+      tagSpan.style.background = catColors[en.category] || '#999';
+      tagSpan.textContent = en.category;
+      
+      var personSpan = document.createElement('span');
+      personSpan.className = 'exp-person';
+      personSpan.textContent = (en.person === '共同' && en.paidBy) ? ('共同(' + en.paidBy + '付)') : en.person;
+      
+      var noteSpan = document.createElement('span');
+      noteSpan.className = 'exp-note';
+      noteSpan.textContent = en.note || '';
+      
+      var amtWrap = document.createElement('span');
+      amtWrap.className = 'exp-amt-wrap';
+      var amtSpan = document.createElement('span');
+      amtSpan.className = 'exp-amt';
+      amtSpan.textContent = '¥' + en.amount.toLocaleString();
+      var twdSpan = document.createElement('span');
+      twdSpan.className = 'exp-twd';
+      twdSpan.textContent = '≈NT$' + Math.round(en.amount * getFxRate()).toLocaleString();
+      amtWrap.appendChild(amtSpan);
+      amtWrap.appendChild(twdSpan);
+      
+      var delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'exp-del';
+      delBtn.textContent = '✕';
+      delBtn.addEventListener('click', async function(){
+        try {
+          // 從 Firebase 刪除該筆資料
+          const { deleteDoc, doc } = window.firebaseFirestoreModules;
+          await deleteDoc(doc(getDb(), "expenses", en.id));
+        } catch(e) {
+          console.error("刪除失敗: ", e);
+        }
+      });
+      
+      li.appendChild(tagSpan);
+      li.appendChild(personSpan);
+      li.appendChild(noteSpan);
+      li.appendChild(amtWrap);
+      li.appendChild(delBtn);
+      list.appendChild(li);
+    });
+
+    var rate = getFxRate();
+    var total = 0;
+    PEOPLE.forEach(function(p, idx){
+      var v = sums[p] || 0;
+      total += v;
+      var elA = document.getElementById('sumP' + idx);
+      var elB = document.getElementById('sumP' + idx + 'Twd');
+      if(elA) elA.textContent = '¥' + v.toLocaleString();
+      if(elB) elB.textContent = '≈NT$' + Math.round(v * rate).toLocaleString();
+    });
+    var sharedJpy = sums['共同'] || 0;
+    total += sharedJpy;
+    document.getElementById('sumShared').textContent = '¥' + sharedJpy.toLocaleString();
+    document.getElementById('sumSharedTwd').textContent = '≈NT$' + Math.round(sharedJpy * rate).toLocaleString();
+    document.getElementById('sumTotal').textContent = '¥' + total.toLocaleString();
+    document.getElementById('sumTotalTwd').textContent = '≈NT$' + Math.round(total * rate).toLocaleString();
+    var qsBudget = document.getElementById('qsBudget');
+    if(qsBudget){ qsBudget.textContent = '¥' + total.toLocaleString(); }
+    
+    var bar = document.getElementById('expBar');
+    bar.innerHTML = '';
+    if(total > 0){
+      Object.keys(catSums).forEach(function(c){
+        var seg = document.createElement('div');
+        seg.className = 'exp-bar-seg';
+        seg.style.width = (catSums[c] / total * 100) + '%';
+        seg.style.background = catColors[c] || '#999';
+        seg.title = c + ' ¥' + catSums[c].toLocaleString();
+        bar.appendChild(seg);
+      });
+    }
+    renderSettlement();
+  }
+
+  function computeSettlement(){
+    var balances = {};
+    PEOPLE.forEach(function(p){ balances[p] = 0; });
+    entries.forEach(function(en){
+      if(en.person !== '共同') return;
+      var payer = en.paidBy;
+      if(!payer || PEOPLE.indexOf(payer) === -1) return;
+      var share = en.amount / PEOPLE.length;
+      PEOPLE.forEach(function(p){ balances[p] -= share; });
+      balances[payer] += en.amount;
+    });
+    PEOPLE.forEach(function(p){ balances[p] = Math.round(balances[p]); });
+
+    var creditors = [], debtors = [];
+    PEOPLE.forEach(function(p){
+      if(balances[p] > 0) creditors.push({p:p, amt:balances[p]});
+      else if(balances[p] < 0) debtors.push({p:p, amt:-balances[p]});
+    });
+    var transfers = [];
+    var ci = 0, di = 0;
+    while(ci < creditors.length && di < debtors.length){
+      var amt = Math.min(creditors[ci].amt, debtors[di].amt);
+      if(amt > 0){ transfers.push({from:debtors[di].p, to:creditors[ci].p, amt:amt}); }
+      creditors[ci].amt -= amt;
+      debtors[di].amt -= amt;
+      if(creditors[ci].amt <= 0) ci++;
+      if(debtors[di].amt <= 0) di++;
+    }
+    return {balances:balances, transfers:transfers};
+  }
+
+  function renderSettlement(){
+    var balDiv = document.getElementById('settleBalances');
+    var tDiv = document.getElementById('settleTransfers');
+    if(!balDiv || !tDiv) return;
+    var result = computeSettlement();
+    balDiv.innerHTML = '';
+    PEOPLE.forEach(function(p){
+      var v = result.balances[p];
+      var item = document.createElement('div');
+      item.className = 'settle-bal-item' + (v > 0 ? ' get' : (v < 0 ? ' owe' : ''));
+      var label = v > 0 ? ('應收 ¥' + v.toLocaleString()) : (v < 0 ? ('應付 ¥' + Math.abs(v).toLocaleString()) : '¥0');
+      item.innerHTML = '<span>' + p + '</span><b>' + label + '</b>';
+      balDiv.appendChild(item);
+    });
+    tDiv.innerHTML = '';
+    if(!result.transfers.length){
+      var empty = document.createElement('div');
+      empty.className = 'settle-empty';
+      empty.textContent = '目前沒有需要結算的共同項目';
+      tDiv.appendChild(empty);
+    }else{
+      result.transfers.forEach(function(t){
+        var row = document.createElement('div');
+        row.className = 'settle-transfer-item';
+        row.innerHTML = t.from + ' → ' + t.to + ' 應付 <b>¥' + t.amt.toLocaleString() + '</b>';
+        tDiv.appendChild(row);
+      });
+    }
+  }
+
+  var personSel = document.getElementById('expPerson');
+  var paidByWrap = document.getElementById('expPaidByWrap');
+  function syncPaidByVisibility(){
+    if(!personSel || !paidByWrap) return;
+    paidByWrap.classList.toggle('hidden', personSel.value !== '共同');
+  }
+  if(personSel){
+    personSel.addEventListener('change', syncPaidByVisibility);
+    syncPaidByVisibility();
+  }
+
+  var addBtn = document.getElementById('expAdd');
+  if(addBtn){
+    addBtn.addEventListener('click', async function(){
+      var person = document.getElementById('expPerson').value;
+      var isShared = person === '共同';
+      var paidBy = isShared ? document.getElementById('expPaidBy').value : undefined;
+      var category = document.getElementById('expCategory').value;
+      var amount = parseFloat(document.getElementById('expAmount').value);
+      var note = document.getElementById('expNote').value.trim();
+      if(isNaN(amount) || amount <= 0) return;
+
+      try {
+        const { collection, addDoc } = window.firebaseFirestoreModules;
+        await addDoc(collection(getDb(), "expenses"), {
+          person: person,
+          category: category,
+          amount: amount,
+          note: note,
+          paidBy: paidBy || null,
+          createdAt: Date.now()
         });
-        li.appendChild(tagSpan);
-        li.appendChild(personSpan);
-        li.appendChild(noteSpan);
-        li.appendChild(amtWrap);
-        li.appendChild(delBtn);
-        list.appendChild(li);
-      });
-      var rate = getFxRate();
-      var total = 0;
-      PEOPLE.forEach(function(p, idx){
-        var v = sums[p] || 0;
-        total += v;
-        var elA = document.getElementById('sumP' + idx);
-        var elB = document.getElementById('sumP' + idx + 'Twd');
-        if(elA) elA.textContent = '¥' + v.toLocaleString();
-        if(elB) elB.textContent = '≈NT$' + Math.round(v * rate).toLocaleString();
-      });
-      var sharedJpy = sums['共同'] || 0;
-      total += sharedJpy;
-      document.getElementById('sumShared').textContent = '¥' + sharedJpy.toLocaleString();
-      document.getElementById('sumSharedTwd').textContent = '≈NT$' + Math.round(sharedJpy * rate).toLocaleString();
-      document.getElementById('sumTotal').textContent = '¥' + total.toLocaleString();
-      document.getElementById('sumTotalTwd').textContent = '≈NT$' + Math.round(total * rate).toLocaleString();
-      var qsBudget = document.getElementById('qsBudget');
-      if(qsBudget){ qsBudget.textContent = '¥' + total.toLocaleString(); }
-      var bar = document.getElementById('expBar');
-      bar.innerHTML = '';
-      if(total > 0){
-        Object.keys(catSums).forEach(function(c){
-          var seg = document.createElement('div');
-          seg.className = 'exp-bar-seg';
-          seg.style.width = (catSums[c] / total * 100) + '%';
-          seg.style.background = catColors[c] || '#999';
-          seg.title = c + ' ¥' + catSums[c].toLocaleString();
-          bar.appendChild(seg);
-        });
-      }
-      renderSettlement();
-    }
-
-    // 計算「共同」項目的分帳結算：balances 正值=應收，負值=應付；transfers 為建議轉帳清單
-    function computeSettlement(){
-      var balances = {};
-      PEOPLE.forEach(function(p){ balances[p] = 0; });
-      entries.forEach(function(en){
-        if(en.person !== '共同') return;
-        var payer = en.paidBy;
-        if(!payer || PEOPLE.indexOf(payer) === -1) return;
-        var share = en.amount / PEOPLE.length;
-        PEOPLE.forEach(function(p){ balances[p] -= share; });
-        balances[payer] += en.amount;
-      });
-      PEOPLE.forEach(function(p){ balances[p] = Math.round(balances[p]); });
-
-      var creditors = [], debtors = [];
-      PEOPLE.forEach(function(p){
-        if(balances[p] > 0) creditors.push({p:p, amt:balances[p]});
-        else if(balances[p] < 0) debtors.push({p:p, amt:-balances[p]});
-      });
-      var transfers = [];
-      var ci = 0, di = 0;
-      while(ci < creditors.length && di < debtors.length){
-        var amt = Math.min(creditors[ci].amt, debtors[di].amt);
-        if(amt > 0){ transfers.push({from:debtors[di].p, to:creditors[ci].p, amt:amt}); }
-        creditors[ci].amt -= amt;
-        debtors[di].amt -= amt;
-        if(creditors[ci].amt <= 0) ci++;
-        if(debtors[di].amt <= 0) di++;
-      }
-      return {balances:balances, transfers:transfers};
-    }
-
-    function renderSettlement(){
-      var balDiv = document.getElementById('settleBalances');
-      var tDiv = document.getElementById('settleTransfers');
-      if(!balDiv || !tDiv) return;
-      var result = computeSettlement();
-      balDiv.innerHTML = '';
-      PEOPLE.forEach(function(p){
-        var v = result.balances[p];
-        var item = document.createElement('div');
-        item.className = 'settle-bal-item' + (v > 0 ? ' get' : (v < 0 ? ' owe' : ''));
-        var label = v > 0 ? ('應收 ¥' + v.toLocaleString()) : (v < 0 ? ('應付 ¥' + Math.abs(v).toLocaleString()) : '¥0');
-        item.innerHTML = '<span>' + p + '</span><b>' + label + '</b>';
-        balDiv.appendChild(item);
-      });
-      tDiv.innerHTML = '';
-      if(!result.transfers.length){
-        var empty = document.createElement('div');
-        empty.className = 'settle-empty';
-        empty.textContent = '目前沒有需要結算的共同項目';
-        tDiv.appendChild(empty);
-      }else{
-        result.transfers.forEach(function(t){
-          var row = document.createElement('div');
-          row.className = 'settle-transfer-item';
-          row.innerHTML = t.from + ' → ' + t.to + ' 應付 <b>¥' + t.amt.toLocaleString() + '</b>';
-          tDiv.appendChild(row);
-        });
-      }
-    }
-
-    // 只有選「共同」時，「先付款人」欄位才有意義，所以只在那時候顯示
-    var personSel = document.getElementById('expPerson');
-    var paidByWrap = document.getElementById('expPaidByWrap');
-    function syncPaidByVisibility(){
-      if(!personSel || !paidByWrap) return;
-      paidByWrap.classList.toggle('hidden', personSel.value !== '共同');
-    }
-    if(personSel){
-      personSel.addEventListener('change', syncPaidByVisibility);
-      syncPaidByVisibility();
-    }
-
-    var addBtn = document.getElementById('expAdd');
-    if(addBtn){
-      addBtn.addEventListener('click', function(){
-        var person = document.getElementById('expPerson').value;
-        var isShared = person === '共同';
-        var paidBy = isShared ? document.getElementById('expPaidBy').value : undefined;
-        var category = document.getElementById('expCategory').value;
-        var amount = parseFloat(document.getElementById('expAmount').value);
-        var note = document.getElementById('expNote').value.trim();
-        if(isNaN(amount) || amount <= 0) return;
-        entries.push({person:person, category:category, amount:amount, note:note, paidBy:paidBy});
-        save();
         document.getElementById('expAmount').value = '';
         document.getElementById('expNote').value = '';
-        render();
+      } catch(e) {
+        console.error("新增記帳失敗: ", e);
+        alert("新增失敗，請檢查網路連線");
+      }
+    });
+  }
+
+  function buildExportText(){
+    var rate = getFxRate();
+    var lines = ['🍁 河口湖東京橫濱 記帳明細 🍁', ''];
+    if(!entries.length){
+      lines.push('（目前尚無記帳項目）');
+    }
+    entries.forEach(function(en){
+      var tag = (en.person === '共同' && en.paidBy) ? ('共同(' + en.paidBy + '付)') : en.person;
+      lines.push(tag + '｜' + en.category + '｜¥' + en.amount.toLocaleString() + (en.note ? ('｜' + en.note) : ''));
+    });
+    lines.push('', '— 小計 —');
+    var sums = {}; PEOPLE.forEach(function(p){ sums[p] = 0; }); sums['共同'] = 0;
+    entries.forEach(function(en){ sums[en.person] = (sums[en.person] || 0) + en.amount; });
+    var total = 0;
+    PEOPLE.forEach(function(p){ total += sums[p] || 0; lines.push(p + '：¥' + (sums[p] || 0).toLocaleString()); });
+    total += sums['共同'] || 0;
+    lines.push('共同：¥' + (sums['共同'] || 0).toLocaleString());
+    lines.push('總計：¥' + total.toLocaleString() + '（≈NT$' + Math.round(total * rate).toLocaleString() + '）');
+    lines.push('', '— 分帳結算建議 —');
+    var result = computeSettlement();
+    if(!result.transfers.length){
+      lines.push('print 暫無結算項目');
+    }else{
+      result.transfers.forEach(function(t){
+        lines.push(t.from + ' → ' + t.to + '：¥' + t.amt.toLocaleString());
       });
     }
+    return lines.join('\n');
+  }
 
-    // ---------- 記帳明細匯出（複製／下載），方便備份到LINE群組 ----------
-    function buildExportText(){
-      var rate = getFxRate();
-      var lines = ['🍁 河口湖東京橫濱 記帳明細 🍁', ''];
-      if(!entries.length){
-        lines.push('（目前尚無記帳項目）');
+  var copyBtn = document.getElementById('expCopyBtn');
+  if(copyBtn){
+    copyBtn.addEventListener('click', function(){
+      var text = buildExportText();
+      function done(){
+        copyBtn.textContent = '✓ 已複製，可貼到LINE';
+        copyBtn.classList.add('copied');
+        setTimeout(function(){ copyBtn.textContent = '📋 複製記帳明細'; copyBtn.classList.remove('copied'); }, 2000);
       }
-      entries.forEach(function(en){
-        var tag = (en.person === '共同' && en.paidBy) ? ('共同(' + en.paidBy + '付)') : en.person;
-        lines.push(tag + '｜' + en.category + '｜¥' + en.amount.toLocaleString() + (en.note ? ('｜' + en.note) : ''));
-      });
-      lines.push('', '— 小計 —');
-      var sums = {}; PEOPLE.forEach(function(p){ sums[p] = 0; }); sums['共同'] = 0;
-      entries.forEach(function(en){ sums[en.person] = (sums[en.person] || 0) + en.amount; });
-      var total = 0;
-      PEOPLE.forEach(function(p){ total += sums[p] || 0; lines.push(p + '：¥' + (sums[p] || 0).toLocaleString()); });
-      total += sums['共同'] || 0;
-      lines.push('共同：¥' + (sums['共同'] || 0).toLocaleString());
-      lines.push('總計：¥' + total.toLocaleString() + '（≈NT$' + Math.round(total * rate).toLocaleString() + '）');
-      lines.push('', '— 分帳結算建議 —');
-      var result = computeSettlement();
-      if(!result.transfers.length){
-        lines.push('目前沒有需要結算的共同項目');
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
       }else{
-        result.transfers.forEach(function(t){
-          lines.push(t.from + ' → ' + t.to + '：¥' + t.amt.toLocaleString());
-        });
+        fallbackCopy(text, done);
       }
-      return lines.join('\n');
-    }
+    });
+  }
 
-    var copyBtn = document.getElementById('expCopyBtn');
-    if(copyBtn){
-      copyBtn.addEventListener('click', function(){
-        var text = buildExportText();
-        function done(){
-          copyBtn.textContent = '✓ 已複製，可貼到LINE';
-          copyBtn.classList.add('copied');
-          setTimeout(function(){ copyBtn.textContent = '📋 複製記帳明細'; copyBtn.classList.remove('copied'); }, 2000);
-        }
-        if(navigator.clipboard && navigator.clipboard.writeText){
-          navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
-        }else{
-          fallbackCopy(text, done);
-        }
+  // 監聽並啟動 Firestore 即時同步
+  window.addEventListener('firebase-ready', () => {
+    const { collection, onSnapshot, query, orderBy } = window.firebaseFirestoreModules;
+    const db = getDb();
+    // 依據建立時間排序
+    const q = query(collection(db, "expenses"), orderBy("createdAt", "asc"));
+    onSnapshot(q, (snapshot) => {
+      entries = [];
+      snapshot.forEach((doc) => {
+        entries.push({ id: doc.id, ...doc.data() });
       });
-    }
+      render();
+    });
+  });
 
-    var downloadBtn = document.getElementById('expDownloadBtn');
-    if(downloadBtn){
-      downloadBtn.addEventListener('click', function(e){
-        try{
-          var text = buildExportText();
-          var blob = new Blob([text], {type:'text/plain;charset=utf-8'});
-          var url = URL.createObjectURL(blob);
-          downloadBtn.href = url;
-          downloadBtn.download = '記帳明細.txt';
-          setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
-        }catch(err){
-          e.preventDefault();
-        }
-      });
-    }
-
-    window.renderExpenses = render;
-    render();
-  })();
-
+  window.renderExpenses = render;
+})();
   // ---------- 動態飄落楓葉 ----------
   (function(){
     var container = document.getElementById('mapleLeaves');
@@ -2149,6 +2182,32 @@
       });
     });
   }
+</script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA9C9kDJsVhHD6lsyJZEUKu301kOLX0uZE",
+    authDomain: "trip-tokyo-ab92c.firebaseapp.com",
+    projectId: "trip-tokyo-ab92c",
+    storageBucket: "trip-tokyo-ab92c.firebasestorage.app",
+    messagingSenderId: "506192938318",
+    appId: "1:506192938318:web:477b0807a7f94124098a1f",
+    measurementId: "G-DZBVPRGJR3"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // 把 db 與常用模組掛載到全域，供記帳腳本使用
+  window.db = db;
+  window.firebaseFirestoreModules = {
+    collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy
+  };
+
+  // 發送事件通知記帳系統初始化完成
+  window.dispatchEvent(new CustomEvent('firebase-ready'));
 </script>
 </body>
 </html>
