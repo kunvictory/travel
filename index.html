@@ -1819,13 +1819,15 @@
   loadWeather('wxDay7', 35.6938, 139.7036, '2026-11-06');
   loadWeather('wxDay8', 35.7720, 140.3929, '2026-11-07');
 
-  // ---------- 快速統計：已排景點數 ----------
+// ---------- 快速統計：已排景點數 ----------
   (function(){
     var qsSpots = document.getElementById('qsSpots');
     if(qsSpots){ qsSpots.textContent = document.querySelectorAll('.tag-景點').length; }
   })();
+</script>
 
-// 1. 先載入並初始化 Firebase 連線（必須放前面！）
+<!-- 1. 先載入並初始化 Firebase 連線（必須放前面！） -->
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -1849,8 +1851,6 @@
   };
 
   // 發送事件通知記帳系統初始化完成
-  window.dispatchEvent(new CustomEvent('firebase-ready'));
-</script>
   window.dispatchEvent(new CustomEvent('firebase-ready'));
 </script>
 
