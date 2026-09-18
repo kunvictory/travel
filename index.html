@@ -348,6 +348,16 @@
     padding:9px 10px;border-radius:10px;cursor:pointer;text-decoration:none;display:inline-block;}
   .exp-export-btn:active{background:var(--gold);color:#fff;}
   .exp-export-btn.copied{background:var(--gold);color:#fff;}
+ /* ---------- 新增記帳提示Toast ---------- */
+  .exp-toast{
+    position:fixed;top:16px;left:50%;transform:translate(-50%,-20px);
+    background:var(--ink);color:#fff;font-size:12.5px;font-weight:600;
+    padding:10px 18px;border-radius:999px;z-index:200;
+    opacity:0;transition:opacity .25s ease, transform .25s ease;
+    box-shadow:0 6px 18px rgba(0,0,0,.25);
+    max-width:80%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .exp-toast.show{opacity:1;transform:translate(-50%,0);}
 
   /* ---------- 動態飄落楓葉 ---------- */
   .maple-leaves{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:55;}
@@ -1819,22 +1829,60 @@
   loadWeather('wxDay7', 35.6938, 139.7036, '2026-11-06');
   loadWeather('wxDay8', 35.7720, 140.3929, '2026-11-07');
 
-  // ---------- 快速統計：已排景點數 ----------
+// ---------- 快速統計：已排景點數 ----------
   (function(){
     var qsSpots = document.getElementById('qsSpots');
     if(qsSpots){ qsSpots.textContent = document.querySelectorAll('.tag-景點').length; }
   })();
+</script>
 
-  // ---------- 記帳（小儀／阿琨／靜靜／東祐／共同） ----------
+<!-- 1. 先載入並初始化 Firebase 連線（必須放前面！） -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA9C9kDJsVhHD6lsyJZEUKu301kOLX0uZE",
+    authDomain: "trip-tokyo-ab92c.firebaseapp.com",
+    projectId: "trip-tokyo-ab92c",
+    storageBucket: "trip-tokyo-ab92c.firebasestorage.app",
+    messagingSenderId: "506192938318",
+    appId: "1:506192938318:web:477b0807a7f94124098a1f",
+    measurementId: "G-DZBVPRGJR3"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+// 開啟離線快取：沒網路時記帳先存本機，恢復訊號後自動同步
+  enableIndexedDbPersistence(db).catch(function(err){
+    if(err.code === 'failed-precondition'){
+      console.warn('離線快取無法啟用（可能同時開了多個分頁）');
+    }else if(err.code === 'unimplemented'){
+      console.warn('這個瀏覽器不支援離線快取');
+    }
+  });
+
+  // 把 db 與常用模組掛載到全域，供記帳腳本使用
+  window.db = db;
+  window.firebaseFirestoreModules = {
+    collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy
+  };
+
+  // 發送事件通知記帳系統初始化完成
+  window.dispatchEvent(new CustomEvent('firebase-ready'));
+</script>
+
+<!-- 2. 接著才放 Firebase 雲端即時同步版記帳邏輯 -->
+<script>
+  // ---------- 記帳（Firebase 雲端即時同步版） ----------
   (function(){
-    var STORAGE_KEY = 'expenseEntries';
-    var PEOPLE = ['小儀','阿琨','靜靜','東祐'];
-    var entries = [];
-    try{ entries = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }catch(e){ entries = []; }
-    var catColors = {'餐飲':'#b5573f','交通':'#7e9aa8','購物':'#8fa998','門票':'#c9a876','其他':'#a8998b'};
+    const PEOPLE = ['小儀','阿琨','靜靜','東祐'];
+    let entries = [];
+    const catColors = {'餐飲':'#b5573f','交通':'#7e9aa8','購物':'#8fa998','門票':'#c9a876','其他':'#a8998b'};
 
-    function save(){
-      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }catch(e){}
+    function getDb(){
+      return window.db;
     }
 
     function render(){
@@ -1851,21 +1899,26 @@
       PEOPLE.forEach(function(p){ sums[p] = 0; });
       sums['共同'] = 0;
       var catSums = {};
-      entries.forEach(function(en, i){
+      
+      entries.forEach(function(en){
         sums[en.person] = (sums[en.person] || 0) + en.amount;
         catSums[en.category] = (catSums[en.category] || 0) + en.amount;
         var li = document.createElement('li');
         li.className = 'exp-item';
+        
         var tagSpan = document.createElement('span');
         tagSpan.className = 'exp-tag';
         tagSpan.style.background = catColors[en.category] || '#999';
         tagSpan.textContent = en.category;
+        
         var personSpan = document.createElement('span');
         personSpan.className = 'exp-person';
         personSpan.textContent = (en.person === '共同' && en.paidBy) ? ('共同(' + en.paidBy + '付)') : en.person;
+        
         var noteSpan = document.createElement('span');
         noteSpan.className = 'exp-note';
         noteSpan.textContent = en.note || '';
+        
         var amtWrap = document.createElement('span');
         amtWrap.className = 'exp-amt-wrap';
         var amtSpan = document.createElement('span');
@@ -1876,15 +1929,20 @@
         twdSpan.textContent = '≈NT$' + Math.round(en.amount * getFxRate()).toLocaleString();
         amtWrap.appendChild(amtSpan);
         amtWrap.appendChild(twdSpan);
+        
         var delBtn = document.createElement('button');
         delBtn.type = 'button';
         delBtn.className = 'exp-del';
         delBtn.textContent = '✕';
-        delBtn.addEventListener('click', function(){
-          entries.splice(i, 1);
-          save();
-          render();
+        delBtn.addEventListener('click', async function(){
+          try {
+            const { deleteDoc, doc } = window.firebaseFirestoreModules;
+            await deleteDoc(doc(getDb(), "expenses", en.id));
+          } catch(e) {
+            console.error("刪除失敗: ", e);
+          }
         });
+        
         li.appendChild(tagSpan);
         li.appendChild(personSpan);
         li.appendChild(noteSpan);
@@ -1892,6 +1950,7 @@
         li.appendChild(delBtn);
         list.appendChild(li);
       });
+
       var rate = getFxRate();
       var total = 0;
       PEOPLE.forEach(function(p, idx){
@@ -1910,6 +1969,7 @@
       document.getElementById('sumTotalTwd').textContent = '≈NT$' + Math.round(total * rate).toLocaleString();
       var qsBudget = document.getElementById('qsBudget');
       if(qsBudget){ qsBudget.textContent = '¥' + total.toLocaleString(); }
+      
       var bar = document.getElementById('expBar');
       bar.innerHTML = '';
       if(total > 0){
@@ -1925,7 +1985,6 @@
       renderSettlement();
     }
 
-    // 計算「共同」項目的分帳結算：balances 正值=應收，負值=應付；transfers 為建議轉帳清單
     function computeSettlement(){
       var balances = {};
       PEOPLE.forEach(function(p){ balances[p] = 0; });
@@ -1987,7 +2046,6 @@
       }
     }
 
-    // 只有選「共同」時，「先付款人」欄位才有意義，所以只在那時候顯示
     var personSel = document.getElementById('expPerson');
     var paidByWrap = document.getElementById('expPaidByWrap');
     function syncPaidByVisibility(){
@@ -2001,7 +2059,7 @@
 
     var addBtn = document.getElementById('expAdd');
     if(addBtn){
-      addBtn.addEventListener('click', function(){
+      addBtn.addEventListener('click', async function(){
         var person = document.getElementById('expPerson').value;
         var isShared = person === '共同';
         var paidBy = isShared ? document.getElementById('expPaidBy').value : undefined;
@@ -2009,15 +2067,26 @@
         var amount = parseFloat(document.getElementById('expAmount').value);
         var note = document.getElementById('expNote').value.trim();
         if(isNaN(amount) || amount <= 0) return;
-        entries.push({person:person, category:category, amount:amount, note:note, paidBy:paidBy});
-        save();
-        document.getElementById('expAmount').value = '';
-        document.getElementById('expNote').value = '';
-        render();
+
+        try {
+          const { collection, addDoc } = window.firebaseFirestoreModules;
+          await addDoc(collection(getDb(), "expenses"), {
+            person: person,
+            category: category,
+            amount: amount,
+            note: note,
+            paidBy: paidBy || null,
+            createdAt: Date.now()
+          });
+          document.getElementById('expAmount').value = '';
+          document.getElementById('expNote').value = '';
+        } catch(e) {
+          console.error("新增記帳失敗: ", e);
+          alert("新增失敗，請檢查網路連線");
+        }
       });
     }
 
-    // ---------- 記帳明細匯出（複製／下載），方便備份到LINE群組 ----------
     function buildExportText(){
       var rate = getFxRate();
       var lines = ['🍁 河口湖東京橫濱 記帳明細 🍁', ''];
@@ -2039,7 +2108,7 @@
       lines.push('', '— 分帳結算建議 —');
       var result = computeSettlement();
       if(!result.transfers.length){
-        lines.push('目前沒有需要結算的共同項目');
+         lines.push('目前沒有需要結算的共同項目');
       }else{
         result.transfers.forEach(function(t){
           lines.push(t.from + ' → ' + t.to + '：¥' + t.amt.toLocaleString());
@@ -2064,7 +2133,6 @@
         }
       });
     }
-
     var downloadBtn = document.getElementById('expDownloadBtn');
     if(downloadBtn){
       downloadBtn.addEventListener('click', function(e){
@@ -2080,9 +2148,45 @@
         }
       });
     }
+    // 新增提示小提醒（Toast）
+    function showToast(msg){
+      var toast = document.createElement('div');
+      toast.className = 'exp-toast';
+      toast.textContent = '🔔 ' + msg;
+      document.body.appendChild(toast);
+      requestAnimationFrame(function(){ toast.classList.add('show'); });
+      setTimeout(function(){
+        toast.classList.remove('show');
+        setTimeout(function(){ toast.remove(); }, 300);
+      }, 2500);
+    }
+
+    // 監聽並啟動 Firestore 即時同步
+    var isFirstLoad = true;
+    window.addEventListener('firebase-ready', () => {
+      const { collection, onSnapshot, query, orderBy } = window.firebaseFirestoreModules;
+      const db = getDb();
+      const q = query(collection(db, "expenses"), orderBy("createdAt", "asc"));
+      onSnapshot(q, (snapshot) => {
+        if(!isFirstLoad){
+          snapshot.docChanges().forEach(function(change){
+            if(change.type === 'added'){
+              var d = change.doc.data();
+              var who = (d.person === '共同' && d.paidBy) ? d.paidBy : d.person;
+              showToast(who + ' 剛新增了一筆記帳');
+            }
+          });
+        }
+        entries = [];
+        snapshot.forEach((doc) => {
+          entries.push({ id: doc.id, ...doc.data() });
+        });
+        render();
+        isFirstLoad = false;
+      });
+    });
 
     window.renderExpenses = render;
-    render();
   })();
 
   // ---------- 動態飄落楓葉 ----------
@@ -2140,8 +2244,8 @@
       try{ localStorage.setItem(ON_KEY, enabled ? '1' : '0'); }catch(e){}
     });
   })();
-</script>
-<script>
+
+  // ---------- Service Worker ----------
   if('serviceWorker' in navigator){
     window.addEventListener('load', function(){
       navigator.serviceWorker.register('sw.js').catch(function(err){
