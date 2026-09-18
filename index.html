@@ -1836,26 +1836,53 @@
   })();
 </script>
 
-<!-- Google Apps Script 雲端版記帳邏輯 -->
+<!-- 1. 先載入並初始化 Firebase 連線（必須放前面！） -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA9C9kDJsVhHD6lsyJZEUKu301kOLX0uZE",
+    authDomain: "trip-tokyo-ab92c.firebaseapp.com",
+    projectId: "trip-tokyo-ab92c",
+    storageBucket: "trip-tokyo-ab92c.firebasestorage.app",
+    messagingSenderId: "506192938318",
+    appId: "1:506192938318:web:477b0807a7f94124098a1f",
+    measurementId: "G-DZBVPRGJR3"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+// 開啟離線快取：沒網路時記帳先存本機，恢復訊號後自動同步
+  enableIndexedDbPersistence(db).catch(function(err){
+    if(err.code === 'failed-precondition'){
+      console.warn('離線快取無法啟用（可能同時開了多個分頁）');
+    }else if(err.code === 'unimplemented'){
+      console.warn('這個瀏覽器不支援離線快取');
+    }
+  });
+
+  // 把 db 與常用模組掛載到全域，供記帳腳本使用
+  window.db = db;
+  window.firebaseFirestoreModules = {
+    collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy
+  };
+
+  // 發送事件通知記帳系統初始化完成
+  window.dispatchEvent(new CustomEvent('firebase-ready'));
+</script>
+
+<!-- 2. 接著才放 Firebase 雲端即時同步版記帳邏輯 -->
 <script>
-  // ---------- 記帳（Google Apps Script 雲端版） ----------
+  // ---------- 記帳（Firebase 雲端即時同步版） ----------
   (function(){
     const PEOPLE = ['小儀','阿琨','靜靜','東祐'];
     let entries = [];
     const catColors = {'餐飲':'#b5573f','交通':'#7e9aa8','購物':'#8fa998','門票':'#c9a876','其他':'#a8998b'};
-    
-    // 已串入指定的 Google Apps Script 網址
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxcN7BeeOoG6ORbCA4iU_TiC0PiSOwUIFfj7ZpMCQwkp50ApqwRUo_OylNG0rRktl2Lxg/exec";
 
-    async function fetchEntries() {
-      try {
-        let res = await fetch(GAS_URL);
-        let data = await res.json();
-        entries = data;
-        render();
-      } catch(e) {
-        console.error("載入記帳失敗: ", e);
-      }
+    function getDb(){
+      return window.db;
     }
 
     function render(){
@@ -1909,11 +1936,8 @@
         delBtn.textContent = '✕';
         delBtn.addEventListener('click', async function(){
           try {
-            await fetch(GAS_URL, {
-              method: 'POST',
-              body: JSON.stringify({ action: 'delete', id: en.id })
-            });
-            fetchEntries();
+            const { deleteDoc, doc } = window.firebaseFirestoreModules;
+            await deleteDoc(doc(getDb(), "expenses", en.id));
           } catch(e) {
             console.error("刪除失敗: ", e);
           }
@@ -2045,21 +2069,17 @@
         if(isNaN(amount) || amount <= 0) return;
 
         try {
-          await fetch(GAS_URL, {
-            method: 'POST',
-            body: JSON.stringify({
-              action: 'add',
-              person: person,
-              category: category,
-              amount: amount,
-              note: note,
-              paidBy: paidBy || null,
-              createdAt: Date.now()
-            })
+          const { collection, addDoc } = window.firebaseFirestoreModules;
+          await addDoc(collection(getDb(), "expenses"), {
+            person: person,
+            category: category,
+            amount: amount,
+            note: note,
+            paidBy: paidBy || null,
+            createdAt: Date.now()
           });
           document.getElementById('expAmount').value = '';
           document.getElementById('expNote').value = '';
-          fetchEntries();
         } catch(e) {
           console.error("新增記帳失敗: ", e);
           alert("新增失敗，請檢查網路連線");
@@ -2113,7 +2133,6 @@
         }
       });
     }
-    
     var downloadBtn = document.getElementById('expDownloadBtn');
     if(downloadBtn){
       downloadBtn.addEventListener('click', function(e){
@@ -2129,10 +2148,43 @@
         }
       });
     }
+    // 新增提示小提醒（Toast）
+    function showToast(msg){
+      var toast = document.createElement('div');
+      toast.className = 'exp-toast';
+      toast.textContent = '🔔 ' + msg;
+      document.body.appendChild(toast);
+      requestAnimationFrame(function(){ toast.classList.add('show'); });
+      setTimeout(function(){
+        toast.classList.remove('show');
+        setTimeout(function(){ toast.remove(); }, 300);
+      }, 2500);
+    }
 
-    // 初次載入並設定每 10 秒自動輪詢更新資料
-    fetchEntries();
-    setInterval(fetchEntries, 10000);
+    // 監聽並啟動 Firestore 即時同步
+    var isFirstLoad = true;
+    window.addEventListener('firebase-ready', () => {
+      const { collection, onSnapshot, query, orderBy } = window.firebaseFirestoreModules;
+      const db = getDb();
+      const q = query(collection(db, "expenses"), orderBy("createdAt", "asc"));
+      onSnapshot(q, (snapshot) => {
+        if(!isFirstLoad){
+          snapshot.docChanges().forEach(function(change){
+            if(change.type === 'added'){
+              var d = change.doc.data();
+              var who = (d.person === '共同' && d.paidBy) ? d.paidBy : d.person;
+              showToast(who + ' 剛新增了一筆記帳');
+            }
+          });
+        }
+        entries = [];
+        snapshot.forEach((doc) => {
+          entries.push({ id: doc.id, ...doc.data() });
+        });
+        render();
+        isFirstLoad = false;
+      });
+    });
 
     window.renderExpenses = render;
   })();
@@ -2192,6 +2244,15 @@
       try{ localStorage.setItem(ON_KEY, enabled ? '1' : '0'); }catch(e){}
     });
   })();
+
+  // ---------- Service Worker ----------
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(err){
+        console.log('Service Worker 註冊失敗：', err);
+      });
+    });
+  }
 </script>
 </body>
 </html>
